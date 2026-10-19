@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Games">
+<meta name="theme-color" content="#071226">
+<title>Thiago's Games</title>
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#071226;--bg2:#0d2147;--ink:#f2f7ff;--muted:#a9bddb;--line:rgba(255,255,255,.14);
+    --sun:#ffcf4d;--sun-dk:#c99300;--card:#0f1d3a;
+    --font:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--ink);font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;overflow-x:hidden}
+  .sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(1200px 600px at 15% -10%,rgba(56,140,255,.28),transparent 60%),
+               radial-gradient(900px 500px at 100% 0%,rgba(255,170,60,.16),transparent 60%),
+               linear-gradient(180deg,var(--bg2),var(--bg) 60%)}
+  .sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:tw 4s ease-in-out infinite}
+  @keyframes tw{50%{opacity:.1}}
+  main{position:relative;z-index:1;max-width:1180px;margin:0 auto;
+    padding:calc(28px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) calc(16px + env(safe-area-inset-left,0px))}
+  header{display:flex;align-items:center;gap:16px;margin:4px 4px 26px}
+  header img{width:64px;height:64px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.4);flex:none}
+  h1{margin:0;font-weight:900;font-size:clamp(30px,5.4vw,52px);line-height:1;letter-spacing:-.5px}
+  h1 span{color:var(--sun)}
+  header p{margin:6px 0 0;color:var(--muted);font-weight:700;font-size:clamp(15px,2vw,18px)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:20px}
+  .game{position:relative;display:flex;flex-direction:column;border-radius:26px;overflow:hidden;background:var(--card);
+    border:1px solid var(--line);color:inherit;text-decoration:none;box-shadow:0 18px 40px rgba(0,0,0,.35);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s}
+  .game:hover{transform:translateY(-4px);border-color:rgba(255,207,77,.55);box-shadow:0 24px 50px rgba(0,0,0,.45)}
+  .game:active{transform:scale(.98)}
+  .game:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+  .cover{position:relative;aspect-ratio:800/487;background:#0a1a33 center/cover no-repeat}
+  .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(15,29,58,.95))}
+  .tags{position:absolute;left:14px;top:14px;display:flex;gap:6px;flex-wrap:wrap;z-index:1}
+  .tag{background:rgba(4,12,28,.72);border:1px solid rgba(255,255,255,.25);padding:5px 11px;border-radius:999px;font-size:13px;font-weight:800;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .last{position:absolute;right:14px;top:14px;z-index:1;background:var(--sun);color:#3d2a00;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:900}
+  .body{padding:4px 20px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+  h2{margin:-8px 0 0;position:relative;z-index:1;font-size:28px;font-weight:900;line-height:1.05}
+  .body p{margin:0;color:var(--muted);font-weight:700;font-size:16px;line-height:1.4}
+  .row{margin-top:auto;padding-top:6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .prog{font-size:14px;font-weight:800;color:#cfe0f7;min-height:1.2em}
+  .play{flex:none;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg,#ffe08a,var(--sun));color:#2a1d00;
+    font-weight:900;font-size:19px;padding:12px 26px;min-height:52px;border-radius:999px;box-shadow:0 5px 0 var(--sun-dk)}
+  .play svg{width:18px;height:18px}
+  footer{margin:34px 4px 0;color:var(--muted);font-weight:700;font-size:14px;text-align:center;opacity:.8}
+  @media (max-width:520px){header img{width:52px;height:52px;border-radius:14px}h2{font-size:24px}}
+  @media (prefers-reduced-motion:reduce){.game,.sky i{transition:none;animation:none}}
+</style>
+</head>
+<body>
+<div class="sky" id="sky"></div>
+<main>
+  <header>
+    <img src="icon-180.png" alt="">
+    <div>
+      <h1>Thiago's <span>Games</span></h1>
+      <p>Pick a game and play.</p>
+    </div>
+  </header>
+
+  <section class="grid" id="grid">
+    <a class="game" href="skybreaker/" data-id="skybreaker">
+      <div class="cover" style="background-image:url(cover-skybreaker.jpg)">
+        <div class="tags"><span class="tag">3D</span><span class="tag">Fighter jets</span></div>
+      </div>
+      <div class="body">
+        <h2>Skybreaker</h2>
+        <p>Fly the last jet in the sky. Shoot down drones, beat 24 levels and boss fights, upgrade your jet and build a squadron.</p>
+        <div class="row"><span class="prog" data-prog="skybreaker"></span><span class="play">Play <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></div>
+      </div>
+    </a>
+
+    <a class="game" href="shark-rush-3d/" data-id="shark-rush-3d">
+      <div class="cover" style="background-image:url(cover-shark-rush-3d.jpg)">
+        <div class="tags"><span class="tag">3D</span><span class="tag">Sharks</span><span class="tag">Math</span></div>
+      </div>
+      <div class="body">
+        <h2>Shark Rush 3D</h2>
+        <p>Swim anywhere in a living reef. Grow from the tiniest shark to the Megalodon and level up your math from adding to dividing.</p>
+        <div class="row"><span class="prog" data-prog="shark-rush-3d"></span><span class="play">Play <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></div>
+      </div>
+    </a>
+
+    <a class="game" href="shark-rush/" data-id="shark-rush">
+      <div class="cover" style="background-image:url(cover-shark-rush.jpg)">
+        <div class="tags"><span class="tag">Classic</span><span class="tag">Sharks</span><span class="tag">Math</span></div>
+      </div>
+      <div class="body">
+        <h2>Shark Rush</h2>
+        <p>The original side-view shark game. Drag to swim, eat smaller fish, find the fish with the right answer and grow to the Megalodon.</p>
+        <div class="row"><span class="prog" data-prog="shark-rush"></span><span class="play">Play <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></div>
+      </div>
+    </a>
+  </section>
+
+  <footer>Tip: on iPad, tap Share then “Add to Home Screen” to keep all the games one tap away.</footer>
+</main>
+<script>
+(function(){
+  var sky=document.getElementById('sky');
+  for(var i=0;i<60;i++){var s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*55+'%';s.style.animationDelay=(Math.random()*4)+'s';sky.appendChild(s);}
+  function get(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+  function setLast(id){try{localStorage.setItem('arcade.last',id);}catch(e){}}
+  var last=null;try{last=localStorage.getItem('arcade.last');}catch(e){}
+  var prog={};
+  var sb=get('sky.save');
+  if(sb&&typeof sb==='object'){var lv=Math.min(24,sb.lvUnlocked|0);prog.skybreaker=lv>1?('Level '+lv+' of 24 unlocked'):(sb.coins?'Started':'');}
+  var s3=get('shark3d_save');
+  if(s3&&s3.best&&(s3.best.total>0))prog['shark-rush-3d']='Best: shark '+((s3.best.level|0)+1)+' of 12';
+  var s2=get('sharkrush_best');
+  if(s2&&s2.total>0)prog['shark-rush']='Best: shark '+((s2.level|0)+1)+' of 8';
+  document.querySelectorAll('[data-prog]').forEach(function(el){el.textContent=prog[el.dataset.prog]||'New';});
+  document.querySelectorAll('.game').forEach(function(a){
+    if(a.dataset.id===last){var b=document.createElement('span');b.className='last';b.textContent='Last played';a.querySelector('.cover').appendChild(b);}
+    a.addEventListener('click',function(){setLast(a.dataset.id);});
+  });
+})();
+</script>
+</body>
+</html>
