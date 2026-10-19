@@ -58,6 +58,7 @@
     font-weight:900;font-size:19px;padding:12px 26px;min-height:52px;border-radius:999px;box-shadow:0 5px 0 var(--sun-dk)}
   .play svg{width:18px;height:18px}
   footer{margin:34px 4px 0;color:var(--muted);font-weight:700;font-size:14px;text-align:center;opacity:.8}
+  @media (min-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:520px){header img{width:52px;height:52px;border-radius:14px}h2{font-size:24px}}
   @media (prefers-reduced-motion:reduce){.game,.sky i{transition:none;animation:none}}
 </style>
@@ -74,6 +75,17 @@
   </header>
 
   <section class="grid" id="grid">
+    <a class="game" href="number-dojo/" data-id="number-dojo">
+      <div class="cover" style="background-image:url(cover-number-dojo.jpg)">
+        <div class="tags"><span class="tag">New</span><span class="tag">Math tricks</span><span class="tag">Big numbers</span></div>
+      </div>
+      <div class="body">
+        <h2>Number Dojo</h2>
+        <p>Learn secret math moves from a master and break boards with your brain. Go from adding to 20 all the way to percents and 2-digit times in your head.</p>
+        <div class="row"><span class="prog" data-prog="number-dojo"></span><span class="play">Play <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></span></div>
+      </div>
+    </a>
+
     <a class="game" href="skybreaker/" data-id="skybreaker">
       <div class="cover" style="background-image:url(cover-skybreaker.jpg)">
         <div class="tags"><span class="tag">3D</span><span class="tag">Fighter jets</span></div>
@@ -122,6 +134,8 @@
   if(sb&&typeof sb==='object'){var lv=Math.min(24,sb.lvUnlocked|0);prog.skybreaker=lv>1?('Level '+lv+' of 24 unlocked'):(sb.coins?'Started':'');}
   var s3=get('shark3d_save');
   if(s3&&s3.best&&(s3.best.total>0))prog['shark-rush-3d']='Best: shark '+((s3.best.level|0)+1)+' of 12';
+  var dj=get('dojo.v1');
+  if(dj&&dj.profiles&&dj.profiles.length){var cur=dj.profiles.filter(function(x){return x.id===dj.cur})[0]||dj.profiles[0];var belts=['White','Yellow','Orange','Green','Blue','Purple','Brown','Red','Black'],ids=['white','yellow','orange','green','blue','purple','brown','red','black'],n=0;for(var i=0;i<ids.length;i++)if(cur.earned&&cur.earned[ids[i]])n=i+1;prog['number-dojo']=(dj.profiles.length>1?dj.profiles.length+' students · ':'')+(n?belts[n-1]+' Belt':'White Belt in training');}
   var s2=get('sharkrush_best');
   if(s2&&s2.total>0)prog['shark-rush']='Best: shark '+((s2.level|0)+1)+' of 8';
   document.querySelectorAll('[data-prog]').forEach(function(el){el.textContent=prog[el.dataset.prog]||'New';});

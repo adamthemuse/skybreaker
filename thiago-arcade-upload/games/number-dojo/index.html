@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2a1d12">
+<title>Number Dojo</title>
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../icon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f7f0e1;--paper2:#efe4cc;--wood:#b9844f;--wood2:#8f5f33;--ink:#1f2a44;--ink2:#4a5674;--red:#d64545;--red2:#a92f2f;
+  --gold:#f2b90f;--gold2:#c48f00;--green:#2fa85a;--blue:#3a7bdc;--card:#fffaf0;--line:rgba(31,42,68,.14);
+  --font:'Nunito','Avenir Next','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#2a1d12}
+body{font-family:var(--font);color:var(--ink);-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button{font-family:inherit;color:inherit}
+[hidden]{display:none!important}
+
+/* ---------- dojo background ---------- */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:
+   linear-gradient(180deg,transparent 0 66%,rgba(0,0,0,.08) 66%,transparent 67%),
+   repeating-linear-gradient(90deg,transparent 0 118px,#8f5f33 118px 126px),
+   linear-gradient(180deg,#f3e8d1 0 66%,transparent 66%);
+}
+#bg::before{content:"";position:absolute;left:0;right:0;top:0;height:66%;
+  background:repeating-linear-gradient(0deg,transparent 0 58px,rgba(143,95,51,.22) 58px 60px),repeating-linear-gradient(90deg,transparent 0 58px,rgba(143,95,51,.22) 58px 60px)}
+#bg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:repeating-linear-gradient(90deg,#c08b55 0 160px,#b27d48 160px 162px,#c99560 162px 320px,#b27d48 320px 322px);box-shadow:inset 0 14px 30px rgba(0,0,0,.18)}
+#bg .win{position:absolute;left:50%;top:7%;transform:translateX(-50%);width:min(520px,70vw);aspect-ratio:2.2;border:12px solid #8f5f33;border-radius:6px;overflow:hidden;
+  background:linear-gradient(180deg,#9fd3ff,#e9f6ff 70%);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#bg .win svg{position:absolute;inset:0;width:100%;height:100%}
+#bg .banner{position:absolute;top:0;width:70px;height:46%;background:linear-gradient(180deg,#c33 0,#a22 100%);box-shadow:0 8px 20px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;color:#ffe9a8;font-size:34px;font-weight:900;writing-mode:vertical-rl;letter-spacing:6px}
+#bg .banner.l{left:4%}#bg .banner.r{right:4%}
+#bg .banner::after{content:"";position:absolute;bottom:-18px;left:0;border-left:35px solid transparent;border-right:35px solid transparent;border-top:18px solid #a22}
+
+/* ---------- screens ---------- */
+#app{position:fixed;inset:0;z-index:1}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:flex;flex-direction:column;
+  padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+.screen>.wrap{margin:auto;width:100%;max-width:1100px}
+.panel{min-width:0;background:var(--card);border:3px solid var(--ink);border-radius:26px;box-shadow:0 8px 0 rgba(31,42,68,.85),0 18px 40px rgba(0,0,0,.25);padding:20px}
+h1,h2,h3{margin:0;line-height:1.1}
+.title{font-weight:900;font-size:clamp(34px,6vw,64px);letter-spacing:-.5px;color:var(--ink);text-shadow:0 4px 0 rgba(255,255,255,.6)}
+.title span{color:var(--red)}
+.sub{font-weight:700;color:var(--ink2);font-size:clamp(15px,2vw,19px);margin-top:6px}
+
+.btn{border:3px solid var(--ink);background:#fff;border-radius:18px;padding:12px 20px;min-height:54px;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 5px 0 var(--ink);transition:transform .06s,box-shadow .06s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.primary{background:var(--gold);}
+.btn.red{background:var(--red);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.big{font-size:24px;min-height:70px;padding:14px 32px;border-radius:22px}
+.btn.small{min-height:42px;font-size:15px;padding:8px 14px;border-radius:14px;box-shadow:0 4px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:0 5px 0 var(--ink)}
+.btn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.iconbtn{width:52px;height:52px;border-radius:16px;border:3px solid var(--ink);background:#fff;font-size:24px;box-shadow:0 4px 0 var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.iconbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.center{text-align:center;justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:5px 12px;font-weight:900;font-size:15px}
+
+/* ---------- avatar ---------- */
+.av{width:100%;height:100%;overflow:visible}
+.av .armL{transform-box:view-box;transform-origin:66px 126px}
+.av .armR{transform-box:view-box;transform-origin:134px 126px}
+.av .legL{transform-box:view-box;transform-origin:86px 178px}
+.av .legR{transform-box:view-box;transform-origin:114px 178px}
+.av .upper{transform-box:view-box;transform-origin:100px 182px}
+.av .body{transform-box:view-box;transform-origin:100px 260px}
+.av .head{transform-box:view-box;transform-origin:100px 120px}
+.idle .av .body{animation:breathe 2.6s ease-in-out infinite}
+.idle .av .head{animation:nod 5s ease-in-out infinite}
+@keyframes breathe{50%{transform:translateY(-3px) scaleY(1.01)}}
+@keyframes nod{0%,80%,100%{transform:rotate(0)}88%{transform:rotate(-4deg)}}
+.pose-chop .av .armR{animation:chop .5s cubic-bezier(.3,.1,.3,1)}
+@keyframes chop{0%{transform:rotate(0)}40%{transform:rotate(-160deg)}70%{transform:rotate(-20deg)}100%{transform:rotate(0)}}
+.pose-chop .av .upper{animation:lean .5s ease}
+@keyframes lean{40%{transform:rotate(-4deg)}70%{transform:rotate(6deg)}}
+.pose-kick .av .legR{animation:kick .55s ease}
+@keyframes kick{0%{transform:rotate(0)}45%,60%{transform:rotate(-95deg)}100%{transform:rotate(0)}}
+.pose-kick .av .upper{animation:leanb .55s ease}
+@keyframes leanb{45%,60%{transform:rotate(-10deg)}}
+.pose-punch .av .armR{animation:punch .4s ease}
+@keyframes punch{0%{transform:rotate(0)}40%,60%{transform:rotate(-88deg) translateY(-6px)}100%{transform:rotate(0)}}
+.pose-bow .av .upper{animation:bow 1.2s ease}
+@keyframes bow{30%,70%{transform:rotate(28deg)}}
+.pose-cheer .av .armL{animation:cheerL .9s ease 2}
+.pose-cheer .av .armR{animation:cheerR .9s ease 2}
+.pose-cheer .av .body{animation:hop .45s ease 4}
+@keyframes cheerL{30%,70%{transform:rotate(150deg)}}
+@keyframes cheerR{30%,70%{transform:rotate(-150deg)}}
+@keyframes hop{50%{transform:translateY(-16px)}}
+.pose-oops .av .head{animation:shake .5s ease}
+@keyframes shake{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.flip .av{transform:scaleX(-1)}
+
+/* ---------- master bubble ---------- */
+.master{display:flex;gap:12px;align-items:flex-end}
+.master .who{width:110px;height:154px;flex:none}
+.bubble{position:relative;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:14px 16px;font-weight:800;font-size:clamp(16px,2vw,19px);line-height:1.35;box-shadow:0 5px 0 rgba(31,42,68,.85)}
+.bubble::before{content:"";position:absolute;left:-16px;bottom:22px;border-right:16px solid var(--ink);border-top:10px solid transparent;border-bottom:10px solid transparent}
+.bubble::after{content:"";position:absolute;left:-11px;bottom:24px;border-right:12px solid #fff;border-top:8px solid transparent;border-bottom:8px solid transparent}
+.bubble b{color:var(--red)}
+
+/* ---------- profiles ---------- */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-top:20px}
+.pcard{border:3px solid var(--ink);border-radius:24px;background:#fff;box-shadow:0 6px 0 var(--ink);padding:10px 10px 14px;cursor:pointer;text-align:center;position:relative}
+.pcard:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.pcard .pa{height:170px}
+.pcard b{display:block;font-size:20px}
+.pcard small{font-weight:800;color:var(--ink2)}
+.pcard .beltbar{height:10px;border-radius:5px;margin:6px 20px 0;border:2px solid rgba(0,0,0,.3)}
+.pcard.new{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240px;border-style:dashed;font-weight:900;font-size:20px}
+.pcard.new span{font-size:54px;line-height:1}
+
+/* ---------- creator ---------- */
+.creator{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:20px;align-items:start}
+.creator .preview{height:380px;background:radial-gradient(circle at 50% 70%,#fff8e6,#f1e2c2);border:3px solid var(--ink);border-radius:26px}
+.opt h3{font-size:17px;margin:14px 0 8px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:48px;height:48px;border-radius:14px;border:3px solid var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink);position:relative;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;background:#fff}
+.sw.on{outline:4px solid var(--red);outline-offset:2px}
+.sw.hairopt{width:64px;height:64px;padding:2px}
+.sw.hairopt{overflow:hidden}.sw.hairopt svg{width:100%;height:100%;overflow:hidden}
+.sw.locked{opacity:.4}
+.nameinput{font-family:inherit;font-size:24px;font-weight:900;border:3px solid var(--ink);border-radius:16px;padding:10px 14px;width:100%;max-width:360px;background:#fff;color:var(--ink);-webkit-user-select:text;user-select:text}
+
+/* ---------- hub ---------- */
+.topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.me{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid var(--ink);border-radius:20px;padding:4px 14px 4px 4px;box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.me .mini{width:52px;height:60px;overflow:hidden}
+.me .mini svg{width:52px;height:73px;margin-top:-4px}
+.me b{font-size:18px;display:block}.me small{font-weight:800;color:var(--ink2);font-size:13px}
+.spacer{flex:1}
+.flame{font-size:20px}
+.hubgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:14px}
+.nextcard{display:flex;gap:14px;align-items:center}
+.nextcard .mcard-ico{font-size:52px}
+.belts{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 12px;scrollbar-width:thin;touch-action:pan-x pan-y}
+.beltpill{flex:none;min-width:118px;border:3px solid var(--ink);border-radius:18px;padding:8px 10px;background:#fff;box-shadow:0 4px 0 var(--ink);cursor:pointer;text-align:center;font-weight:900;font-size:14px;position:relative}
+.beltpill .bk{height:14px;border-radius:7px;border:2px solid rgba(0,0,0,.35);margin:2px 0 6px}
+.beltpill.sel{outline:4px solid var(--red);outline-offset:2px}
+.beltpill.locked{opacity:.45}
+.beltpill .done{position:absolute;top:-10px;right:-8px;background:var(--green);color:#fff;border:2.5px solid var(--ink);border-radius:999px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
+.mcard{border:3px solid var(--ink);border-radius:20px;background:#fff;box-shadow:0 5px 0 var(--ink);padding:12px;cursor:pointer;text-align:left;display:flex;gap:10px;align-items:center;min-height:88px}
+.mcard:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.mcard .ico{font-size:34px;width:44px;text-align:center;flex:none}
+.mcard b{display:block;font-size:17px}
+.mcard small{font-weight:800;color:var(--ink2)}
+.mcard.locked{opacity:.45;cursor:default}
+.mcard.mastered{background:linear-gradient(135deg,#fff7d6,#ffe48a)}
+.stars{color:#d9a400;letter-spacing:1px;font-size:16px}
+.stars .off{color:#d6cdb8}
+.navrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.navrow .btn{flex-direction:column;gap:2px;min-height:82px;font-size:16px}
+.navrow .btn span{font-size:28px}
+.badge{position:absolute;top:-8px;right:-8px;background:var(--red);color:#fff;border:2.5px solid var(--ink);border-radius:999px;min-width:26px;height:26px;font-size:13px;display:flex;align-items:center;justify-content:center;padding:0 6px}
+.rel{position:relative}
+
+/* ---------- move screen ---------- */
+.movehead{display:flex;align-items:center;gap:14px}
+.movehead .ico{font-size:60px}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.stepbtn{border:3px solid var(--ink);border-radius:22px;background:#fff;box-shadow:0 6px 0 var(--ink);padding:14px;cursor:pointer;text-align:center;font-weight:900}
+.stepbtn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.stepbtn span{display:block;font-size:40px}
+.stepbtn b{display:block;font-size:20px}
+.stepbtn small{font-weight:800;color:var(--ink2);font-size:13px}
+.stepbtn.done{background:#e7f8ec}
+.stepbtn.locked{opacity:.4;cursor:default}
+
+/* ---------- session ---------- */
+.sess{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:16px;align-items:stretch;min-height:100%}
+.sbar{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.pdots{display:flex;gap:5px;flex-wrap:wrap}
+.pdots i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--ink);background:#fff}
+.pdots i.ok{background:var(--green)}.pdots i.bad{background:var(--red)}.pdots i.help{background:var(--gold)}.pdots i.now{transform:scale(1.3)}
+.arena{position:relative;min-height:300px;border:3px solid var(--ink);border-radius:26px;overflow:hidden;background:linear-gradient(180deg,#fdf6e7 0 70%,#c99560 70%);box-shadow:0 6px 0 rgba(31,42,68,.85)}
+.arena .fighter{position:absolute;bottom:6%;width:34%;max-width:200px;aspect-ratio:200/280}
+.arena .fighter.p1{left:6%}
+.arena .fighter.p2{right:6%}
+.arena .stand{position:absolute;bottom:8%;right:8%;width:40%;height:46%}
+.blocks{position:absolute;bottom:0;left:0;right:0;height:34%;display:flex;justify-content:space-between}
+.blocks i{width:24%;height:100%;background:linear-gradient(180deg,#9aa0a8,#7d838c);border:3px solid #4a4f57;border-radius:6px}
+.stack{position:absolute;left:4%;right:4%;bottom:34%;display:flex;flex-direction:column-reverse;gap:3px}
+.board{position:relative;height:22px;border:3px solid #5b3a1c;border-radius:5px;background:repeating-linear-gradient(90deg,#e8c48c 0 18px,#ddb57a 18px 22px,#ebcb96 22px 40px);box-shadow:inset 0 -4px 0 rgba(0,0,0,.12)}
+.m-oak .board{background:repeating-linear-gradient(90deg,#b07a45 0 18px,#a06c3a 18px 22px,#bb8650 22px 40px);border-color:#4a2a12}
+.m-brick .board{height:28px;background:linear-gradient(90deg,#c0503a 0 48%,#7a2a1e 48% 52%,#c0503a 52%);border-color:#5a1c12}
+.m-stone .board{height:28px;background:linear-gradient(180deg,#a7a9ad,#85878c);border-color:#45474c}
+.m-ice .board{background:linear-gradient(180deg,rgba(200,240,255,.95),rgba(140,210,245,.9));border-color:#3a8cbf}
+.m-glass .board{background:linear-gradient(135deg,#c4f3ff,#7fd6ff 40%,#e9fbff 60%,#7fd6ff);border-color:#2a7fa8}
+.m-gold .board{background:linear-gradient(180deg,#ffe27a,#e0a91e);border-color:#8a5a00}
+.board.broken{animation:none;visibility:hidden}
+.half{position:absolute;top:0;height:100%;width:50%;border:inherit;background:inherit;border-radius:5px}
+.piece{position:absolute;height:22px;border:3px solid #5b3a1c;border-radius:5px;pointer-events:none;z-index:4}
+.chip-p{position:absolute;width:8px;height:8px;border-radius:2px;background:#c9965c;pointer-events:none;z-index:5}
+.hitfx{position:absolute;font-weight:900;font-size:34px;color:var(--red);text-shadow:0 3px 0 #fff,0 0 12px #fff;pointer-events:none;z-index:6;animation:pop 1s ease forwards}
+@keyframes pop{0%{transform:scale(.4);opacity:0}20%{transform:scale(1.2);opacity:1}100%{transform:translateY(-50px) scale(1);opacity:0}}
+.qside{display:flex;flex-direction:column;gap:12px}
+.qcard{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:14px 16px;box-shadow:0 6px 0 rgba(31,42,68,.85);text-align:center}
+.qcard .qlabel{font-weight:800;color:var(--ink2);font-size:14px}
+.qcard .q{font-weight:900;font-size:clamp(34px,5.4vw,58px);letter-spacing:-.5px;line-height:1.1;margin:4px 0}
+.qcard .q.long{font-size:clamp(22px,3.4vw,32px)}
+.ansbox{display:inline-block;min-width:150px;padding:4px 16px;border:3px dashed var(--ink2);border-radius:16px;font-weight:900;font-size:clamp(30px,4.4vw,46px);min-height:62px;background:#fffdf6}
+.ansbox.ok{border-color:var(--green);border-style:solid;background:#e3f7e9;color:var(--green)}
+.ansbox.bad{border-color:var(--red);border-style:solid;background:#fde6e6;color:var(--red);animation:wob .35s}
+@keyframes wob{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{min-height:62px;border:3px solid var(--ink);border-radius:16px;background:#fff;font-size:28px;font-weight:900;box-shadow:0 4px 0 var(--ink);cursor:pointer}
+.pad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);background:#fff4cc}
+.pad .go{background:var(--green);color:#fff}
+.pad .del{background:#ffe0e0}
+.ynpad{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ynpad button{min-height:90px;font-size:30px}
+.helpbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.timer{font-weight:900;font-size:16px}
+
+/* help overlay */
+.helpbox{background:#fffef8;border:3px solid var(--ink);border-radius:24px;padding:14px;box-shadow:0 6px 0 rgba(31,42,68,.85)}
+.helpbox .lvl{display:inline-block;font-weight:900;font-size:13px;background:var(--gold);border:2px solid var(--ink);border-radius:999px;padding:2px 10px}
+.steplist{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.steplist div{font-weight:800;font-size:17px;padding:6px 10px;border-radius:12px;background:#f3ecdc}
+.steplist div.cur{background:#fff3c4;border:2px solid var(--gold2)}
+.steplist div.done{background:#e3f7e9;color:#1d6e3b}
+.vis{margin:8px auto;max-width:640px}
+.vnote{text-align:center;font-weight:800;color:var(--ink2);font-size:15px}
+.frames{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.tf{display:grid;grid-template-columns:repeat(5,40px);grid-template-rows:repeat(2,40px);gap:4px;padding:6px;border:3px solid var(--ink);border-radius:12px;background:#fff}
+.tf i{border:2px dashed #c9bfa8;border-radius:50%;transition:all .3s}
+.tf i.ca{background:#3a7bdc;border:2px solid #1d3f7a}
+.tf i.cb{background:#ff8a3c;border:2px solid #a24a0e}
+.tf i.cx{background:#ddd;border:2px solid #999;position:relative}
+.tf i.cx::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--red);font-weight:900;font-size:22px}
+.line svg{width:100%;height:auto;display:block}
+.line .lt{font:800 15px var(--font);fill:#2b3550}
+.line .jl{font:900 14px var(--font);fill:#2b3550}
+.line .jump{stroke-dasharray:600;stroke-dashoffset:600;animation:draw .7s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.area{display:inline-block;width:100%;max-width:440px}
+.area .atop{display:grid;margin-left:44px;text-align:center;font-weight:900;font-size:15px;color:var(--ink2)}
+.area .amid{display:flex}
+.area .aleft{display:grid;width:44px;font-weight:900;font-size:15px;color:var(--ink2);align-items:center;text-align:center}
+.area .agrid{flex:1;display:grid;gap:3px;min-height:120px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--ink)}
+.area .ac{display:flex;align-items:center;justify-content:center;font-size:20px;min-height:46px}
+.groups{display:flex;flex-direction:column;gap:4px;align-items:center}
+.grow{display:flex;gap:4px;padding:3px 6px;border:2px solid #c9bfa8;border-radius:10px;background:#fff}
+.grow i{width:14px;height:14px;border-radius:50%;background:#3a7bdc}
+.grow.dim{opacity:.3}
+.bar .btrack{position:relative;height:46px;border:3px solid var(--ink);border-radius:12px;background:#fff;overflow:hidden}
+.bar .btrack>i{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed rgba(31,42,68,.35)}
+.bar .bfill{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-weight:900;font-size:14px;color:var(--ink);white-space:nowrap;border-right:3px solid var(--ink);transition:width .5s}
+.bar .blab{display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:var(--ink2);margin-top:4px}
+.digits{display:flex;gap:8px;justify-content:center}
+.digits b{min-width:56px;height:68px;padding:0 8px;border:3px solid var(--ink);border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900}
+.digits b.hl{background:#fff1b8;border-color:var(--gold2);transform:translateY(-6px)}
+.eq{text-align:center;font-weight:900;font-size:clamp(24px,3.6vw,36px);padding:10px;background:#fff;border:3px solid var(--ink);border-radius:16px}
+
+/* result / modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(20,14,8,.55);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;touch-action:pan-y}
+.modal .panel{max-width:620px;width:100%;margin:auto;text-align:center}
+.bigstars{font-size:54px;letter-spacing:6px;color:#d9a400}
+.bigstars .off{color:#d6cdb8}
+.statrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.stat{background:#fff7e3;border:2.5px solid var(--ink);border-radius:16px;padding:8px 14px;min-width:100px}
+.stat b{display:block;font-size:24px}.stat small{font-weight:800;color:var(--ink2)}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);z-index:40;background:var(--ink);color:#fff;font-weight:900;border-radius:999px;padding:10px 20px;box-shadow:0 8px 20px rgba(0,0,0,.3);animation:tin .3s ease}
+@keyframes tin{from{transform:translate(-50%,-20px);opacity:0}}
+.confetti{position:fixed;width:10px;height:14px;z-index:30;pointer-events:none;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* layout responsiveness */
+@media (max-width:820px){
+  .sess{grid-template-columns:1fr}
+  .arena{min-height:220px;max-height:34vh}
+  .hubgrid{grid-template-columns:1fr}
+  .creator{grid-template-columns:1fr}
+  .creator .preview{height:260px;max-width:260px;margin:0 auto}
+  .steps3{grid-template-columns:1fr}
+}
+@media (max-height:640px) and (min-width:821px){
+  .arena{min-height:220px}
+  .pad button{min-height:48px;font-size:24px}
+  .qcard .q{font-size:clamp(28px,4vw,44px)}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+
+.arena .scroll{position:absolute;top:5%;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,#fffaf0,#f1e3c4);border:3px solid var(--ink);border-radius:10px;padding:8px 22px;font-weight:900;font-size:clamp(16px,2.2vw,22px);white-space:nowrap;box-shadow:0 5px 0 rgba(31,42,68,.6);display:flex;gap:8px;align-items:center}
+.arena .scroll::before,.arena .scroll::after{content:"";position:absolute;top:-6px;bottom:-6px;width:10px;background:#8f5f33;border:2px solid var(--ink);border-radius:5px}
+.arena .scroll::before{left:-8px}.arena .scroll::after{right:-8px}
+
+.bprog small{font-weight:800;color:var(--ink2)}
+.bprogbar{height:16px;border:2.5px solid var(--ink);border-radius:9px;background:#fff;overflow:hidden;margin:4px 0}
+.bprogbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#ffd84a)}
+@media (min-width:821px){.arena{height:clamp(320px,64vh,580px)}}
+
+@media (max-height:520px) and (min-width:600px){
+  .sess{grid-template-columns:minmax(0,1fr) minmax(300px,1fr);gap:10px}
+  .arena{height:calc(100dvh - 86px);min-height:0}
+  .qside{gap:6px}.qcard{padding:6px 10px}.qcard .q{font-size:30px}.ansbox{min-height:42px;font-size:26px;padding:2px 12px}
+  .pad{gap:5px}.pad button{min-height:40px;font-size:22px;border-radius:12px}
+  .ynpad button{min-height:56px}
+  .arena .scroll{font-size:14px;padding:4px 14px}
+  .helpbox{padding:8px}.vis{margin:4px auto}
+  .qside{max-height:calc(100dvh - 86px);overflow-y:auto}
+  .tf{grid-template-columns:repeat(5,24px);grid-template-rows:repeat(2,24px);gap:3px;padding:4px}
+  .digits b{height:46px;font-size:26px;min-width:40px}.eq{font-size:20px;padding:6px}
+  .steplist div{font-size:15px;padding:4px 8px}
+}
+@media (max-width:520px){.sbar b{font-size:15px}.pdots i{width:11px;height:11px}}
+
+/* ---------- sparring ---------- */
+.score{position:absolute;top:4%;left:4%;right:4%;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:2}
+.score .sc{background:#fff;border:3px solid var(--ink);border-radius:16px;padding:4px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 var(--ink)}
+.score .sc b{font-size:16px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score .sc span{font-size:30px;font-weight:900;color:var(--red)}
+.score .vs{font-weight:900;font-size:14px;background:var(--ink);color:#fff;border-radius:999px;padding:4px 10px}
+.rbar{position:absolute;top:calc(4% + 58px);right:4%;width:46%;z-index:2;text-align:right}
+.rtrack{height:14px;border:2.5px solid var(--ink);border-radius:8px;background:#fff;overflow:hidden}
+.rtrack i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fb3ff,#3a7bdc)}
+.rbar small{font-weight:900;font-size:13px;color:var(--ink2)}
+/* ---------- chant ---------- */
+.chant{text-align:center;min-height:min(70vh,520px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.beats{display:flex;gap:12px}
+.beats i{width:26px;height:26px;border-radius:50%;border:3px solid var(--ink);background:#fff;transition:transform .08s}
+.beats i.on{background:var(--red);transform:scale(1.35)}
+.beats i:first-child.on{background:var(--gold)}
+.cline{font-weight:900;font-size:clamp(46px,9vw,92px);letter-spacing:-1px}
+.cline b{color:var(--red)}
+.cline.bump{animation:bump .3s ease}
+@keyframes bump{40%{transform:scale(1.12)}}
+.cwords{font-weight:800;font-size:clamp(18px,2.6vw,26px);color:var(--ink2);min-height:1.4em}
+.cchoices{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.cchoices .btn{min-width:120px;font-size:34px;min-height:84px}
+.cprog{font-weight:800;color:var(--ink2)}
+.ctable{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin:14px 0;max-height:55vh;overflow:auto;text-align:left}
+.ctable div{background:#fff7e3;border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:800}
+
+/* ---------- master challenge ---------- */
+.crowd{position:absolute;left:0;right:0;top:20%;height:30%;opacity:.55;z-index:0}
+.crowd .mate{position:absolute;width:15%;max-width:90px;aspect-ratio:200/280}
+.arena .fighter.mwatch{left:auto;right:44%;width:22%;max-width:130px;bottom:28%;opacity:.95;z-index:0}
+.arena .fighter.p1,.arena .stand{z-index:1}
+.tally{position:absolute;left:4%;top:4%;z-index:2;background:#fff;border:3px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:900;font-size:15px}
+.arena .scroll{z-index:2}
+/* ---------- move book ---------- */
+.booksec{margin-bottom:18px}
+.booksec h3{font-size:20px}
+.booksec small{font-weight:800;color:var(--ink2)}
+.beltdot{width:30px;height:14px;border-radius:7px;border:2.5px solid var(--ink)}
+.bookgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:8px}
+.bookcard{border:3px solid var(--ink);border-radius:18px;background:#fff;box-shadow:0 4px 0 var(--ink);padding:10px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:2px;align-items:center}
+.bookcard .bi{font-size:34px}
+.bookcard b{font-size:15px}
+.bookcard.unk{background:#eee6d4;color:#8b8577;border-style:dashed}
+.bookcard.gold{background:linear-gradient(135deg,#fff7d6,#ffe48a)}
+
+/* ---------- shop ---------- */
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.shopitem{border:3px solid var(--ink);border-radius:18px;background:#fff;box-shadow:0 4px 0 var(--ink);padding:10px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+.shopitem.own{background:#f2fbf4}
+.shopitem small{font-weight:800;color:var(--ink2);font-size:12px}
+.shopsw{width:70px;height:70px;border-radius:16px;border:3px solid var(--ink)}
+.shopsw.band{height:24px;margin:23px 0}
+.shopmat{width:100px;display:flex;flex-direction:column;gap:3px;padding:8px 0}
+/* ---------- parents ---------- */
+.ptable{border-collapse:collapse;width:100%;min-width:720px;font-weight:700;font-size:14px}
+.ptable th,.ptable td{border-bottom:2px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
+.ptable th{background:#f3ecdc}
+.ptable tr.stuck td{background:#fff1e0}
+/* ---------- small-screen title ---------- */
+.sbar b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+.sbar .pdots{flex:none;max-width:55%}
+.sbar .spacer{display:none}
+
+</style>
+</head>
+<body>
+<div id="bg"><div class="banner l">数学</div><div class="banner r">道場</div>
+<div class="win"><svg viewBox="0 0 520 236" preserveAspectRatio="xMidYMax slice"><polygon points="0,236 90,110 150,160 230,60 320,170 390,100 520,200 520,236" fill="#7aa3c9"/><polygon points="230,60 250,90 215,92" fill="#fff"/><polygon points="390,100 405,122 375,122" fill="#fff"/><polygon points="0,236 120,170 200,210 300,150 420,210 520,180 520,236" fill="#4f7a5a"/><circle cx="440" cy="50" r="24" fill="#ffe08a"/></svg></div></div>
+<div id="app"></div>
+<script>
+/* ================= NUMBER DOJO · MATH ENGINE =================
+   Pure logic: belts, moves, problem generators, guided steps, visuals.
+   Every problem: {move, q, ans, kind:'num'|'yn', hint, steps:[{p,a,kind?,v?}], v0, size}
+   Steps break the problem down; the last step's answer always equals the full answer.
+*/
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=n=>typeof n==='number'?n.toLocaleString('en-US'):n;
+const T=(n)=>Math.floor(n/10)*10, O=(n)=>n%10;
+
+/* ---------- visual helpers ---------- */
+// ten-frame state: arrays of 10 cells: 0 empty, 'a' first color, 'b' second color, 'x' crossed out
+function frameOf(nA,nB,crossed){const c=[];for(let i=0;i<10;i++)c.push(i<nA?'a':i<nA+nB?'b':0);if(crossed)for(let i=0;i<crossed;i++){const k=9-i;if(c[k])c[k]='x'}return c}
+const V={
+  frames:(frames,note)=>({type:'frames',frames,note}),
+  line:(from,to,jumps,mark)=>({type:'line',from,to,jumps:jumps||[],mark}),
+  area:(rows,cols,vals,note)=>({type:'area',rows,cols,vals,note}),
+  groups:(g,each,note,hl)=>({type:'groups',g,each,note,hl}),
+  bar:(total,parts,note)=>({type:'bar',total,parts,note}),
+  digits:(digits,note,hl)=>({type:'digits',digits,note,hl}),
+  eq:(text)=>({type:'eq',text})
+};
+function lineRange(lo,hi){const span=hi-lo;let step=span<=20?1:span<=60?5:span<=200?10:span<=1200?100:1000;const a=Math.floor(lo/step)*step,b=Math.ceil(hi/step)*step;return [a===b?a-step:a,b]}
+
+/* ---------- small multiplication helper (used by Flip It, Tricky Facts) ---------- */
+function multSteps(b,a){ // b is the small factor we have a move for
+  const p=a*b;
+  if(b===2)return[{p:`Double ${a} = ?`,a:p}];
+  if(b===3)return[{p:`Double ${a} = ?`,a:2*a},{p:`${2*a} + ${a} = ?`,a:p}];
+  if(b===4)return[{p:`Double ${a} = ?`,a:2*a},{p:`Double ${2*a} = ?`,a:p}];
+  if(b===5)return[{p:`${a} × 10 = ?`,a:10*a},{p:`Half of ${10*a} = ?`,a:p}];
+  if(b===10)return[{p:`${a} with a zero on the end = ?`,a:p}];
+  if(b===9)return[{p:`${a} × 10 = ?`,a:10*a},{p:`${10*a} − ${a} = ?`,a:p}];
+  if(b===6)return[{p:`5 × ${a} = ?`,a:5*a},{p:`${5*a} + ${a} = ?`,a:p}];
+  return[{p:`${b} × ${a} = ?`,a:p}];
+}
+
+/* ================= BELTS ================= */
+const BELTS=[
+  {id:'white', name:'White Belt', color:'#f4f1e8', ink:'#3b3b3b', goal:'Add within 20 instantly', material:'pine'},
+  {id:'yellow',name:'Yellow Belt',color:'#ffd84a', ink:'#5a4300', goal:'Subtract within 20, add & subtract to 100', material:'pine'},
+  {id:'orange',name:'Orange Belt',color:'#ff9a3c', ink:'#5a2a00', goal:'×2, ×3, ×4, ×5, ×10 fast', material:'oak'},
+  {id:'green', name:'Green Belt', color:'#3cc46a', ink:'#0d3a1c', goal:'All the times tables and dividing', material:'oak'},
+  {id:'blue',  name:'Blue Belt',  color:'#3a8cff', ink:'#06264f', goal:'Add & subtract 3-digit numbers in your head', material:'brick'},
+  {id:'purple',name:'Purple Belt',color:'#9b5cff', ink:'#2a0c5a', goal:'Multiply big numbers by one digit', material:'brick'},
+  {id:'brown', name:'Brown Belt', color:'#9a6234', ink:'#2e1606', goal:'2-digit × 2-digit in your head', material:'stone'},
+  {id:'red',   name:'Red Belt',   color:'#ef3b3b', ink:'#4a0606', goal:'Percents of any number', material:'ice'},
+  {id:'black', name:'Black Belt', color:'#1b1b1f', ink:'#ffffff', goal:'Master mix with big numbers', material:'glass'}
+];
+
+/* ================= MOVES =================
+   gen() returns a problem. pre = prerequisite move (for "go back a step").
+   target = seconds for a 3-board break in training.
+*/
+const MOVES=[];
+const M=(o)=>{MOVES.push(o);return o};
+
+/* ---------- WHITE ---------- */
+M({id:'tenfriends',belt:'white',name:'Ten Friends',icon:'🤝',target:3,
+  teach:'Ten Friends are pairs that make 10: 1+9, 2+8, 3+7, 4+6, 5+5. Know them by heart and lots of math gets easy.',
+  gen(){const a=ri(1,9),b=10-a;return{q:`${a} + ? = 10`,ans:b,hint:`What goes with ${a} to make 10? Count up from ${a}.`,
+    v0:V.frames([frameOf(a,0)],`${a} dots. How many empty spots?`),
+    steps:[{p:`Count the empty spots: ${a} + ? = 10`,a:b,v:V.frames([frameOf(a,b)],`${a} + ${b} = 10`)}],size:10}}});
+M({id:'counton',belt:'white',name:'Count On',icon:'👉',target:3,pre:'tenfriends',
+  teach:'Start at the BIG number and count up the small one. 12 + 3: start at 12, then 13, 14, 15.',
+  gen(){const a=ri(4,16),b=ri(1,3);if(Math.random()<.3)return this.wrap(b,a);return this.wrap(a,b)},
+  wrap(a,b){const big=Math.max(a,b),sm=Math.min(a,b),ans=a+b,steps=[];for(let i=1;i<=sm;i++)steps.push({p:`${big+i-1} + 1 = ?`,a:big+i,v:V.line(...lineRange(big-1,ans+1),[{from:big,to:big+i,label:`+${i}`}],big+i)});
+    return{q:`${a} + ${b}`,ans,hint:`Start at ${big} and count up ${sm}.`,v0:V.line(...lineRange(big-1,ans+1),[],big),steps,size:ans}}});
+M({id:'doubles',belt:'white',name:'Doubles',icon:'👯',target:3,
+  teach:'A double is a number plus itself: 6 + 6 = 12. For big doubles, split each number into 5 and the rest. 8 + 8 → (5+5) and (3+3) → 10 and 6 → 16.',
+  gen(){const a=ri(2,10),ans=2*a;
+    if(a<=5)return{q:`${a} + ${a}`,ans,hint:`Same number twice. Think of ${a} pairs.`,v0:V.frames([frameOf(a,0),frameOf(0,a)]),steps:[{p:`${a} + ${a} = ?`,a:ans,v:V.frames([frameOf(a,0),frameOf(0,a)],`${a} + ${a} = ${ans}`)}],size:ans};
+    const r=a-5;return{q:`${a} + ${a}`,ans,hint:`Split each ${a} into 5 and ${r}. 5 + 5 = 10.`,v0:V.frames([frameOf(a,0),frameOf(0,a)]),
+      steps:[{p:`5 + 5 = ?`,a:10,v:V.frames([frameOf(5,0),frameOf(0,5)],'5 + 5 = 10')},{p:`${r} + ${r} = ?`,a:2*r,v:V.frames([frameOf(a,0),frameOf(0,a)],`${r} + ${r} = ${2*r}`)},{p:`10 + ${2*r} = ?`,a:ans,v:V.eq(`${a} + ${a} = ${ans}`)}],size:ans}}});
+M({id:'neardoubles',belt:'white',name:'Near Doubles',icon:'🪞',target:3,pre:'doubles',
+  teach:'6 + 7 is almost a double! Do 6 + 6 = 12, then one more: 13.',
+  gen(){const a=ri(2,9),x=Math.random()<.5?[a,a+1]:[a+1,a],ans=2*a+1;
+    return{q:`${x[0]} + ${x[1]}`,ans,hint:`Use the double: ${a} + ${a}, then add 1.`,v0:V.frames([frameOf(x[0],0),frameOf(0,x[1])]),
+      steps:[{p:`Double: ${a} + ${a} = ?`,a:2*a,v:V.frames([frameOf(a,0),frameOf(0,a)],`${a} + ${a} = ${2*a}`)},{p:`${2*a} + 1 = ?`,a:ans,v:V.eq(`${x[0]} + ${x[1]} = ${ans}`)}],size:ans}}});
+M({id:'maketen',belt:'white',name:'Make Ten',icon:'🔟',target:4,pre:'tenfriends',
+  teach:'凑十法 — the Make Ten move. 9 + 5: give 1 from the 5 to the 9 to make 10. What is left? 4. So 10 + 4 = 14.',
+  gen(){const big=ri(6,9),small=ri(11-big,9),need=10-big,rest=small-need,ans=big+small,x=Math.random()<.65?[big,small]:[small,big];
+    return{q:`${x[0]} + ${x[1]}`,ans,hint:`${big} needs ${need} to make 10. Take ${need} from ${small}.`,
+      v0:V.frames([frameOf(big,0),frameOf(0,small)],`${big} and ${small}`),
+      steps:[{p:`How much does ${big} need to make 10?`,a:need,v:V.frames([frameOf(big,need),frameOf(0,rest)],`Move ${need} over to make a ten`)},
+             {p:`Take ${need} from ${small}. What is left?`,a:rest,v:V.frames([frameOf(10,0),frameOf(0,rest)],`A full ten and ${rest} left`)},
+             {p:`10 + ${rest} = ?`,a:ans,v:V.eq(`${x[0]} + ${x[1]} = ${ans}`)}],size:ans}}});
+
+/* ---------- YELLOW ---------- */
+function subPair(regroup){for(;;){const c=ri(11,18),b=ri(2,9),d=c-b;if(d<1||d>9)continue;if(regroup&&b<=c-10)continue;return[c,b]}}
+M({id:'thinkadd',belt:'yellow',name:'Think Addition',icon:'🔄',target:4,pre:'maketen',
+  teach:'想加算减 — to subtract, think addition! 15 − 7: ask "7 plus what makes 15?" 7 + 3 = 10, + 5 more = 15. So the answer is 8.',
+  gen(){const[c,b]=subPair(true),ans=c-b,up1=10-b,up2=c-10;
+    return{q:`${c} − ${b}`,ans,hint:`Ask: ${b} + ? = ${c}. Jump up to 10 first.`,v0:V.line(...lineRange(b-1,c+1),[],b),
+      steps:[{p:`${b} + ? = 10`,a:up1,v:V.line(...lineRange(b-1,c+1),[{from:b,to:10,label:`+${up1}`}],10)},
+             {p:`10 + ? = ${c}`,a:up2,v:V.line(...lineRange(b-1,c+1),[{from:b,to:10,label:`+${up1}`},{from:10,to:c,label:`+${up2}`}],c)},
+             {p:`${up1} + ${up2} = ?`,a:ans,v:V.eq(`${c} − ${b} = ${ans}`)}],size:c}}});
+M({id:'breakten',belt:'yellow',name:'Break the Ten',icon:'🪓',target:4,pre:'tenfriends',
+  teach:'破十法 — Break the Ten. 13 − 8: split 13 into 10 and 3. Take 8 from the 10: 2 left. Add the 3 back: 5.',
+  gen(){const[c,b]=subPair(true),ones=c-10,ans=c-b;
+    return{q:`${c} − ${b}`,ans,hint:`Split ${c} into 10 and ${ones}. Take ${b} from the 10.`,v0:V.frames([frameOf(10,0),frameOf(0,ones)],`${c} = 10 and ${ones}`),
+      steps:[{p:`Split ${c} into 10 and ?`,a:ones,v:V.frames([frameOf(10,0),frameOf(0,ones)],`10 and ${ones}`)},
+             {p:`10 − ${b} = ?`,a:10-b,v:V.frames([frameOf(10,0,b),frameOf(0,ones)],`Cross out ${b} from the ten`)},
+             {p:`${10-b} + ${ones} = ?`,a:ans,v:V.eq(`${c} − ${b} = ${ans}`)}],size:c}}});
+M({id:'downten',belt:'yellow',name:'Down to Ten',icon:'⬇️',target:4,pre:'tenfriends',
+  teach:'平十法 — Down to Ten. 13 − 5: first take 3 to land on 10. You still need to take 2 more: 10 − 2 = 8.',
+  gen(){const[c,b]=subPair(true),first=c-10,more=b-first,ans=c-b;
+    return{q:`${c} − ${b}`,ans,hint:`Jump down to 10 first (take ${first}), then take the rest.`,v0:V.line(...lineRange(ans-1,c+1),[],c),
+      steps:[{p:`${c} − ? = 10`,a:first,v:V.line(...lineRange(ans-1,c+1),[{from:c,to:10,label:`−${first}`}],10)},
+             {p:`You took ${first}. How much more to take away? ${b} − ${first} = ?`,a:more,v:V.line(...lineRange(ans-1,c+1),[{from:c,to:10,label:`−${first}`}],10)},
+             {p:`10 − ${more} = ?`,a:ans,v:V.line(...lineRange(ans-1,c+1),[{from:c,to:10,label:`−${first}`},{from:10,to:ans,label:`−${more}`}],ans)}],size:c}}});
+M({id:'addtens',belt:'yellow',name:'Tens Then Ones',icon:'➕',target:6,pre:'counton',
+  teach:'Add big numbers in two jumps: 34 + 25 → add the tens first (34 + 20 = 54), then the ones (54 + 5 = 59).',
+  gen(){let a,b;do{a=ri(12,74);b=ri(11,39)}while(a+b>99||O(b)===0);const t=T(b),o=O(b),ans=a+b,[lo,hi]=lineRange(a,ans);
+    return{q:`${a} + ${b}`,ans,hint:`Add ${t} first, then ${o}.`,v0:V.line(lo,hi,[],a),
+      steps:[{p:`${a} + ${t} = ?`,a:a+t,v:V.line(lo,hi,[{from:a,to:a+t,label:`+${t}`}],a+t)},
+             {p:`${a+t} + ${o} = ?`,a:ans,v:V.line(lo,hi,[{from:a,to:a+t,label:`+${t}`},{from:a+t,to:ans,label:`+${o}`}],ans)}],size:ans}}});
+M({id:'subtens',belt:'yellow',name:'Jump Back',icon:'↩️',target:6,pre:'downten',
+  teach:'Subtract big numbers in two jumps back: 72 − 36 → take the tens (72 − 30 = 42), then the ones (42 − 6 = 36).',
+  gen(){let a,b;do{a=ri(41,99);b=ri(11,a-10)}while(O(b)===0);const t=T(b),o=O(b),ans=a-b,[lo,hi]=lineRange(ans,a);
+    return{q:`${a} − ${b}`,ans,hint:`Take away ${t} first, then ${o}.`,v0:V.line(lo,hi,[],a),
+      steps:[{p:`${a} − ${t} = ?`,a:a-t,v:V.line(lo,hi,[{from:a,to:a-t,label:`−${t}`}],a-t)},
+             {p:`${a-t} − ${o} = ?`,a:ans,v:V.line(lo,hi,[{from:a,to:a-t,label:`−${t}`},{from:a-t,to:ans,label:`−${o}`}],ans)}],size:a}}});
+
+/* ---------- ORANGE ---------- */
+M({id:'x2',belt:'orange',name:'Times 2 = Double',icon:'✌️',target:4,pre:'doubles',
+  teach:'× 2 just means double. 2 × 34: double 30 is 60, double 4 is 8, so 68.',
+  gen(){const a=ri(3,45),ans=2*a,x=Math.random()<.5?`2 × ${a}`:`${a} × 2`;
+    if(a<10)return{q:x,ans,hint:`Double ${a}: ${a} + ${a}.`,v0:V.groups(2,a),steps:[{p:`${a} + ${a} = ?`,a:ans,v:V.groups(2,a,`${a} + ${a} = ${ans}`)}],size:ans};
+    const t=T(a),o=O(a);const st=[{p:`Double ${t} = ?`,a:2*t,v:V.area([{n:2,l:'2'}],[{n:t,l:t},{n:Math.max(o,1),l:o}],[[2*t,'?']])}];
+    if(o){st.push({p:`Double ${o} = ?`,a:2*o,v:V.area([{n:2,l:'2'}],[{n:t,l:t},{n:o,l:o}],[[2*t,2*o]])});st.push({p:`${2*t} + ${2*o} = ?`,a:ans,v:V.eq(`2 × ${a} = ${ans}`)})}
+    return{q:x,ans,hint:`Double the tens, double the ones, add them.`,v0:V.area([{n:2,l:'2'}],[{n:t,l:t},{n:Math.max(o,1),l:o}],[['?','?']]),steps:st,size:ans}}});
+M({id:'x10',belt:'orange',name:'Times 10',icon:'🔟',target:3,
+  teach:'× 10 makes every digit move up one place, so a zero appears at the end. 47 × 10 = 470.',
+  gen(){const a=ri(2,99),ans=10*a;return{q:Math.random()<.5?`${a} × 10`:`10 × ${a}`,ans,hint:`Put a zero on the end of ${a}.`,v0:V.digits(String(a).split(''),'Each digit moves up a place'),
+    steps:[{p:`${a} with a zero on the end = ?`,a:ans,v:V.digits(String(ans).split(''),`${a} × 10 = ${ans}`,[String(ans).length-1])}],size:ans}}});
+M({id:'x5',belt:'orange',name:'Times 5',icon:'🖐️',target:5,pre:'x10',
+  teach:'5 is half of 10. So × 5 = × 10, then cut in half. 5 × 18: 18 × 10 = 180, half is 90.',
+  gen(){const a=Math.random()<.6?2*ri(2,24):ri(3,25),ans=5*a;
+    return{q:Math.random()<.5?`5 × ${a}`:`${a} × 5`,ans,hint:`Do ${a} × 10, then take half.`,v0:V.eq(`${a} × 5`),
+      steps:[{p:`${a} × 10 = ?`,a:10*a,v:V.eq(`${a} × 10 = ${10*a}`)},{p:`Half of ${10*a} = ?`,a:ans,v:V.eq(`${a} × 5 = ${ans}`)}],size:ans}}});
+M({id:'x4',belt:'orange',name:'Double Double',icon:'⏫',target:5,pre:'x2',
+  teach:'× 4 = double, then double again. 4 × 16: double is 32, double again is 64.',
+  gen(){const a=ri(3,25),ans=4*a;return{q:Math.random()<.5?`4 × ${a}`:`${a} × 4`,ans,hint:`Double ${a}, then double that.`,v0:V.groups(4,Math.min(a,12)),
+    steps:[{p:`Double ${a} = ?`,a:2*a,v:V.eq(`2 × ${a} = ${2*a}`)},{p:`Double ${2*a} = ?`,a:ans,v:V.eq(`4 × ${a} = ${ans}`)}],size:ans}}});
+M({id:'x3',belt:'orange',name:'Double Plus One',icon:'3️⃣',target:5,pre:'x2',
+  teach:'× 3 = double it, then add one more of it. 3 × 14: double is 28, plus 14 = 42.',
+  gen(){const a=ri(3,20),ans=3*a;return{q:Math.random()<.5?`3 × ${a}`:`${a} × 3`,ans,hint:`Double ${a}, then add ${a} more.`,v0:V.groups(3,Math.min(a,12)),
+    steps:[{p:`Double ${a} = ?`,a:2*a,v:V.eq(`2 × ${a} = ${2*a}`)},{p:`${2*a} + ${a} = ?`,a:ans,v:V.eq(`3 × ${a} = ${ans}`)}],size:ans}}});
+
+/* ---------- GREEN ---------- */
+M({id:'flip',belt:'green',name:'Flip It',icon:'🔃',target:5,pre:'x5',
+  teach:'8 × 3 is the same as 3 × 8! Flip so the easy number is the one you multiply by, then use a move you already know.',
+  gen(){const b=pick([2,3,4,5,10]),a=ri(6,12),ans=a*b;const st=[{p:`Flip it: ${a} × ${b} is the same as ${b} × ${a}. Which number do we multiply by now?`,a:b}].concat(multSteps(b,a));
+    return{q:`${a} × ${b}`,ans,hint:`Flip it to ${b} × ${a} and use your ×${b} move.`,v0:V.groups(Math.min(a,12),b),steps:st,size:ans}}});
+M({id:'x9',belt:'green',name:'Nine Trick',icon:'9️⃣',target:5,pre:'x10',
+  teach:'9 is one less than 10. So 9 × 7 = 10 × 7 − 7 = 70 − 7 = 63. Works for big numbers too: 9 × 23 = 230 − 23 = 207.',
+  gen(){const a=Math.random()<.75?ri(2,12):ri(13,30),ans=9*a;
+    return{q:Math.random()<.5?`9 × ${a}`:`${a} × 9`,ans,hint:`Do ${a} × 10, then take away ${a}.`,v0:V.groups(Math.min(10,10),Math.min(a,12),'10 groups minus 1 group'),
+      steps:[{p:`${a} × 10 = ?`,a:10*a,v:V.eq(`${a} × 10 = ${10*a}`)},{p:`${10*a} − ${a} = ?`,a:ans,v:V.eq(`9 × ${a} = ${ans}`)}],size:ans}}});
+M({id:'x6',belt:'green',name:'Five Plus One',icon:'6️⃣',target:6,pre:'x5',
+  teach:'× 6 = × 5, then add one more. 6 × 8: 5 × 8 = 40, plus 8 = 48.',
+  gen(){const a=ri(3,12),ans=6*a;return{q:Math.random()<.5?`6 × ${a}`:`${a} × 6`,ans,hint:`5 × ${a}, then add ${a}.`,v0:V.groups(6,a),
+    steps:[{p:`5 × ${a} = ?`,a:5*a,v:V.groups(6,a,`5 groups = ${5*a}`)},{p:`${5*a} + ${a} = ?`,a:ans,v:V.eq(`6 × ${a} = ${ans}`)}],size:ans}}});
+M({id:'x78',belt:'green',name:'Tricky 7s and 8s',icon:'🎯',target:7,pre:'x4',
+  teach:'× 8 = double, double, double. 8 × 7: 14, 28, 56. × 7 = × 5 plus × 2. 7 × 6: 30 + 12 = 42.',
+  gen(){const m=pick([7,8]),a=ri(3,9),ans=m*a;
+    const st=m===8?[{p:`Double ${a} = ?`,a:2*a},{p:`Double ${2*a} = ?`,a:4*a},{p:`Double ${4*a} = ?`,a:ans}]:[{p:`5 × ${a} = ?`,a:5*a},{p:`2 × ${a} = ?`,a:2*a},{p:`${5*a} + ${2*a} = ?`,a:ans}];
+    return{q:Math.random()<.5?`${m} × ${a}`:`${a} × ${m}`,ans,hint:m===8?`Double ${a} three times.`:`5 × ${a} plus 2 × ${a}.`,v0:V.groups(m,a),steps:st,size:ans}}});
+M({id:'divide',belt:'green',name:'Think Multiply',icon:'➗',target:6,pre:'flip',
+  teach:'Dividing is multiplying backwards. 56 ÷ 8: ask "8 times what is 56?" 8 × 7 = 56, so the answer is 7.',
+  gen(){const d=ri(2,9),q=ri(2,10),n=d*q;const st=[];
+    if(q>5){st.push({p:`Start with an easy one: ${d} × 5 = ?`,a:5*d});st.push({p:`${n} − ${5*d} = ?  (what is left)`,a:n-5*d});st.push({p:`${n-5*d} ÷ ${d} = ? (how many more ${d}s)`,a:q-5});st.push({p:`5 + ${q-5} = ?`,a:q})}
+    else st.push({p:`${d} × ? = ${n}`,a:q});
+    return{q:`${n} ÷ ${d}`,ans:q,hint:`Think: ${d} × ? = ${n}`,v0:V.groups(q,d,`${n} split into groups of ${d}`),steps:st,size:n}}});
+
+/* ---------- BLUE ---------- */
+M({id:'roundadd',belt:'blue',name:'Round and Fix +',icon:'🎯',target:7,pre:'addtens',
+  teach:'348 + 197: 197 is almost 200! Add 200 (548), then fix it: you added 3 too many, so take 3 away = 545.',
+  gen(){const hund=Math.random()<.6,base=hund?ri(1,6)*100:ri(2,9)*10,k=ri(1,3),b=base-k,a=ri(120,899),ans=a+b,[lo,hi]=lineRange(a,a+base);
+    return{q:`${a} + ${b}`,ans,hint:`${b} is close to ${base}. Add ${base}, then take ${k} away.`,v0:V.line(lo,hi,[],a),
+      steps:[{p:`${b} is close to ${base}. ${a} + ${base} = ?`,a:a+base,v:V.line(lo,hi,[{from:a,to:a+base,label:`+${base}`}],a+base)},
+             {p:`That was ${k} too many. ${a+base} − ${k} = ?`,a:ans,v:V.line(lo,hi,[{from:a,to:a+base,label:`+${base}`},{from:a+base,to:ans,label:`−${k}`}],ans)}],size:Math.max(a,ans)}}});
+M({id:'roundsub',belt:'blue',name:'Round and Fix −',icon:'🎯',target:7,pre:'subtens',
+  teach:'523 − 198: take away 200 instead (323). You took 2 too many, so give 2 back = 325.',
+  gen(){const hund=Math.random()<.6,base=hund?ri(1,5)*100:ri(2,9)*10,k=ri(1,3),b=base-k,a=ri(base+60,999),ans=a-b,[lo,hi]=lineRange(a-base,a);
+    return{q:`${a} − ${b}`,ans,hint:`Take away ${base}, then add ${k} back.`,v0:V.line(lo,hi,[],a),
+      steps:[{p:`${b} is close to ${base}. ${a} − ${base} = ?`,a:a-base,v:V.line(lo,hi,[{from:a,to:a-base,label:`−${base}`}],a-base)},
+             {p:`You took ${k} too many. ${a-base} + ${k} = ?`,a:ans,v:V.line(lo,hi,[{from:a,to:a-base,label:`−${base}`},{from:a-base,to:ans,label:`+${k}`}],ans)}],size:a}}});
+M({id:'placeadd',belt:'blue',name:'Big Adding',icon:'🏗️',target:9,pre:'addtens',
+  teach:'Add big numbers from the LEFT: 345 + 232 → hundreds 300+200 = 500, tens 40+30 = 70, ones 5+2 = 7. Together: 577.',
+  gen(){let a,b;do{a=ri(110,799);b=ri(110,799)}while(a+b>1499);const h=[Math.floor(a/100)*100,Math.floor(b/100)*100],t=[T(a%100),T(b%100)],o=[a%10,b%10],ans=a+b;
+    const H=h[0]+h[1],Tt=t[0]+t[1],Oo=o[0]+o[1];
+    return{q:`${a} + ${b}`,ans,hint:`Hundreds first, then tens, then ones.`,v0:V.area([{n:1,l:''}],[{n:3,l:'hundreds'},{n:2,l:'tens'},{n:1.4,l:'ones'}],[[`${h[0]}+${h[1]}`,`${t[0]}+${t[1]}`,`${o[0]}+${o[1]}`]]),
+      steps:[{p:`Hundreds: ${h[0]} + ${h[1]} = ?`,a:H},{p:`Tens: ${t[0]} + ${t[1]} = ?`,a:Tt},{p:`Ones: ${o[0]} + ${o[1]} = ?`,a:Oo},{p:`${H} + ${Tt} + ${Oo} = ?`,a:ans,v:V.eq(`${a} + ${b} = ${ans}`)}],size:ans}}});
+M({id:'zeros',belt:'blue',name:'Zero Power',icon:'💯',target:6,pre:'x10',
+  teach:'7 × 300: do 7 × 3 = 21, then stick on the zeros: 2100. Count the zeros and add them at the end.',
+  gen(){const a=ri(2,9),d=ri(2,9),z=pick([1,2,2,3]),m=d*10**z,ans=a*m;
+    return{q:Math.random()<.5?`${a} × ${fmt(m)}`:`${fmt(m)} × ${a}`,ans,hint:`${a} × ${d}, then add ${z} zero${z>1?'s':''}.`,v0:V.eq(`${a} × ${fmt(m)}`),
+      steps:[{p:`Ignore the zeros: ${a} × ${d} = ?`,a:a*d},{p:`Now add ${z} zero${z>1?'s':''}: ${a*d} → ?`,a:ans,v:V.eq(`${a} × ${fmt(m)} = ${fmt(ans)}`)}],size:ans}}});
+
+/* ---------- PURPLE ---------- */
+M({id:'split',belt:'purple',name:'Split It Up',icon:'✂️',target:9,pre:'zeros',
+  teach:'6 × 47: split 47 into 40 and 7. 6 × 40 = 240, 6 × 7 = 42. Add them: 282.',
+  gen(){let a,b;do{a=ri(3,9);b=ri(12,99)}while(O(b)===0);const t=T(b),o=O(b),ans=a*b;
+    return{q:Math.random()<.5?`${a} × ${b}`:`${b} × ${a}`,ans,hint:`Split ${b} into ${t} and ${o}.`,v0:V.area([{n:a,l:a}],[{n:t,l:t},{n:o,l:o}],[['?','?']]),
+      steps:[{p:`${a} × ${t} = ?`,a:a*t,v:V.area([{n:a,l:a}],[{n:t,l:t},{n:o,l:o}],[[a*t,'?']])},{p:`${a} × ${o} = ?`,a:a*o,v:V.area([{n:a,l:a}],[{n:t,l:t},{n:o,l:o}],[[a*t,a*o]])},{p:`${a*t} + ${a*o} = ?`,a:ans,v:V.eq(`${a} × ${b} = ${ans}`)}],size:ans}}});
+M({id:'x11',belt:'purple',name:'Eleven Trick',icon:'🎩',target:7,pre:'placeadd',
+  teach:'11 × 36: split the digits 3 _ 6 and put their sum (3+6 = 9) in the middle: 396. If the sum is 10 or more, carry the 1: 11 × 78 → 7 (15) 8 → 858.',
+  gen(){const a=ri(12,99),x=Math.floor(a/10),y=a%10,s=x+y,ans=11*a;
+    const st=[{p:`Add the two digits: ${x} + ${y} = ?`,a:s,v:V.digits([x,'?',y],`Put the sum in the middle`,[1])}];
+    if(s<10)st.push({p:`Put ${s} between ${x} and ${y}: = ?`,a:ans,v:V.digits([x,s,y],`11 × ${a} = ${ans}`,[1])});
+    else{st.push({p:`${s} is 10 or more. Carry 1 to the front: ${x} + 1 = ?`,a:x+1,v:V.digits([x+1,s-10,y],'Carry the 1',[0])});st.push({p:`So the answer is ${x+1} ${s-10} ${y} = ?`,a:ans,v:V.digits([x+1,s-10,y],`11 × ${a} = ${ans}`)})}
+    return{q:Math.random()<.5?`11 × ${a}`:`${a} × 11`,ans,hint:`Add ${x} + ${y} and put it in the middle.`,v0:V.digits([x,'_',y],'Split the digits'),steps:st,size:ans}}});
+M({id:'x25',belt:'purple',name:'Times 25',icon:'🪙',target:8,pre:'x4',
+  teach:'25 is a quarter of 100. 25 × 36: 36 × 100 = 3600, then a quarter of it (half, then half again): 1800, 900.',
+  gen(){const a=4*ri(2,25)*(Math.random()<.85?1:1),ans=25*a;
+    return{q:Math.random()<.5?`25 × ${a}`:`${a} × 25`,ans,hint:`${a} × 100, then half, then half again.`,v0:V.eq(`${a} × 25`),
+      steps:[{p:`${a} × 100 = ?`,a:100*a},{p:`Half of ${100*a} = ?`,a:50*a},{p:`Half of ${50*a} = ?`,a:ans,v:V.eq(`25 × ${a} = ${fmt(ans)}`)}],size:ans}}});
+M({id:'doublehalf',belt:'purple',name:'Double and Halve',icon:'⚖️',target:8,pre:'x2',
+  teach:'16 × 25 is hard, but halve one and double the other and the answer stays the same: 8 × 50 = 400. Keep going until it is easy!',
+  gen(){const a=2*ri(3,12),b=pick([5,15,25,35,45]),ans=a*b;
+    return{q:`${a} × ${b}`,ans,hint:`Halve ${a}, double ${b}.`,v0:V.area([{n:Math.min(a,12),l:a}],[{n:Math.min(b,20),l:b}],[['?']]),
+      steps:[{p:`Half of ${a} = ?`,a:a/2},{p:`Double ${b} = ?`,a:2*b},{p:`${a/2} × ${2*b} = ?`,a:ans,v:V.eq(`${a} × ${b} = ${a/2} × ${2*b} = ${ans}`)}],size:ans}}});
+M({id:'roundmul',belt:'purple',name:'Round and Fix ×',icon:'🎯',target:8,pre:'split',
+  teach:'6 × 49: 49 is almost 50. 6 × 50 = 300, but that is 6 × 1 too many, so 300 − 6 = 294.',
+  gen(){const base=ri(2,9)*10,k=pick([1,1,2]),b=base-k,a=ri(3,9),ans=a*b;
+    return{q:Math.random()<.5?`${a} × ${b}`:`${b} × ${a}`,ans,hint:`${a} × ${base}, then take away ${a} × ${k}.`,v0:V.eq(`${a} × ${b}`),
+      steps:[{p:`${b} is close to ${base}. ${a} × ${base} = ?`,a:a*base},{p:`Too many by ${a} × ${k} = ?`,a:a*k},{p:`${a*base} − ${a*k} = ?`,a:ans,v:V.eq(`${a} × ${b} = ${ans}`)}],size:ans}}});
+
+/* ---------- BROWN ---------- */
+M({id:'sq5',belt:'brown',name:'Square Fives',icon:'🟪',target:7,pre:'zeros',
+  teach:'Any number ending in 5, times itself: 35 × 35. Take the 3, times the next number (3 × 4 = 12), then put 25 on the end: 1225.',
+  gen(){const t=ri(1,9),n=10*t+5,ans=n*n;
+    return{q:`${n} × ${n}`,ans,hint:`${t} × ${t+1}, then write 25 after it.`,v0:V.digits([t,5],`Take the ${t}`,[0]),
+      steps:[{p:`${t} × ${t+1} = ?`,a:t*(t+1),v:V.digits([t*(t+1),'25'],`then 25 on the end`,[0])},{p:`Write 25 after ${t*(t+1)}: = ?`,a:ans,v:V.eq(`${n} × ${n} = ${fmt(ans)}`)}],size:ans}}});
+M({id:'twobytwo',belt:'brown',name:'Two-Digit Times',icon:'🧱',target:12,pre:'split',
+  teach:'23 × 14: split 14 into 10 and 4. 23 × 10 = 230, 23 × 4 = 92. Add: 322. Just two easy pieces!',
+  gen(){let a,b;do{a=ri(12,49);b=ri(12,29)}while(O(b)===0||O(a)===0);const t=T(b),o=O(b),ans=a*b;
+    return{q:`${a} × ${b}`,ans,hint:`Split ${b} into ${t} and ${o}.`,v0:V.area([{n:t,l:t},{n:o,l:o}],[{n:a,l:a}],[['?'],['?']]),
+      steps:[{p:`${a} × ${t} = ?`,a:a*t,v:V.area([{n:t,l:t},{n:o,l:o}],[{n:a,l:a}],[[a*t],['?']])},{p:`${a} × ${o} = ?`,a:a*o,v:V.area([{n:t,l:t},{n:o,l:o}],[{n:a,l:a}],[[a*t],[a*o]])},{p:`${a*t} + ${a*o} = ?`,a:ans,v:V.eq(`${a} × ${b} = ${ans}`)}],size:ans}}});
+M({id:'x99',belt:'brown',name:'Times 99',icon:'💫',target:8,pre:'x9',
+  teach:'99 × 37: 99 is 1 less than 100. 37 × 100 = 3700, minus one 37 = 3663.',
+  gen(){const a=ri(12,99),ans=99*a;return{q:Math.random()<.5?`99 × ${a}`:`${a} × 99`,ans,hint:`${a} × 100, then take away ${a}.`,v0:V.eq(`${a} × 99`),
+    steps:[{p:`${a} × 100 = ?`,a:100*a},{p:`${100*a} − ${a} = ?`,a:ans,v:V.eq(`99 × ${a} = ${fmt(ans)}`)}],size:ans}}});
+M({id:'divrules',belt:'brown',name:'Divide Detective',icon:'🔍',target:6,pre:'divide',
+  teach:'Check without dividing! ÷2: last digit even. ÷5: ends in 0 or 5. ÷3 or ÷9: add up the digits — if the sum divides, the whole number does.',
+  gen(){const d=pick([2,3,5,9,3,9]),want=Math.random()<.5;let n,ok;for(let i=0;i<200;i++){n=ri(102,9999);ok=n%d===0;if(ok===want)break}
+    const ds=String(n).split('').map(Number),sum=ds.reduce((a,b)=>a+b,0),yn=ok?'yes':'no',last=ds[ds.length-1];let st;
+    if(d===2)st=[{p:`The last digit is ${last}. Is ${last} even?`,a:last%2===0?'yes':'no',kind:'yn',v:V.digits(ds,'Look at the last digit',[ds.length-1])}];
+    else if(d===5)st=[{p:`The last digit is ${last}. Is it 0 or 5?`,a:(last===0||last===5)?'yes':'no',kind:'yn',v:V.digits(ds,'Look at the last digit',[ds.length-1])}];
+    else st=[{p:`Add the digits: ${ds.join(' + ')} = ?`,a:sum,v:V.digits(ds,'Add all the digits',ds.map((_,i)=>i))},{p:`Does ${sum} divide evenly by ${d}?`,a:yn,kind:'yn',v:V.eq(`${sum} ÷ ${d} = ${sum%d===0?sum/d:'not even'}`)}];
+    return{q:`Can ${fmt(n)} be split evenly by ${d}?`,ans:yn,kind:'yn',hint:d===2?'Check if the last digit is even.':d===5?'Does it end in 0 or 5?':`Add up the digits and check that number.`,v0:V.digits(ds,'Be a detective'),steps:st,size:n}}});
+
+/* ---------- RED (percents) ---------- */
+M({id:'p50',belt:'red',name:'50% = Half',icon:'🌗',target:5,pre:'x2',
+  teach:'Percent means "out of 100". 50% is half. 50% of 86 = 43. 50% of 640 = 320.',
+  gen(){const n=Math.random()<.5?2*ri(6,99):20*ri(3,60),ans=n/2;return{q:`50% of ${fmt(n)}`,ans,hint:`50% means half. Half of ${n}?`,v0:V.bar(n,[{p:50,l:'50%'}]),
+    steps:n>100&&n%100?[{p:`Half of ${Math.floor(n/100)*100} = ?`,a:Math.floor(n/100)*50},{p:`Half of ${n%100} = ?`,a:(n%100)/2},{p:`${Math.floor(n/100)*50} + ${(n%100)/2} = ?`,a:ans}]:[{p:`Half of ${fmt(n)} = ?`,a:ans,v:V.bar(n,[{p:50,l:`= ${ans}`}])}],size:n}}});
+M({id:'p10',belt:'red',name:'10% Slide',icon:'➗',target:5,pre:'x10',
+  teach:'10% means divide by 10 — just slide the number one place smaller (cross off a zero). 10% of 340 = 34. 10% of 2,500 = 250.',
+  gen(){const n=10*ri(2,450),ans=n/10;return{q:`10% of ${fmt(n)}`,ans,hint:`Cross off one zero from ${fmt(n)}.`,v0:V.bar(n,[{p:10,l:'10%'}]),
+    steps:[{p:`${fmt(n)} ÷ 10 = ? (cross off a zero)`,a:ans,v:V.bar(n,[{p:10,l:`= ${fmt(ans)}`}])}],size:n}}});
+M({id:'p25',belt:'red',name:'25% = Quarter',icon:'🍕',target:6,pre:'p50',
+  teach:'25% is a quarter: half, then half again. 25% of 84 → 42 → 21.',
+  gen(){const n=4*ri(3,150),ans=n/4;return{q:`25% of ${fmt(n)}`,ans,hint:`Half of ${n}, then half again.`,v0:V.bar(n,[{p:25,l:'25%'}]),
+    steps:[{p:`Half of ${fmt(n)} = ?`,a:n/2,v:V.bar(n,[{p:50,l:'50%'}])},{p:`Half of ${fmt(n/2)} = ?`,a:ans,v:V.bar(n,[{p:25,l:`= ${fmt(ans)}`}])}],size:n}}});
+M({id:'p5',belt:'red',name:'5% = Half of 10%',icon:'🪙',target:7,pre:'p10',
+  teach:'5% is half of 10%. 5% of 360: 10% is 36, half is 18.',
+  gen(){const n=20*ri(2,120),ans=n/20;return{q:`5% of ${fmt(n)}`,ans,hint:`Find 10%, then take half.`,v0:V.bar(n,[{p:5,l:'5%'}]),
+    steps:[{p:`10% of ${fmt(n)} = ?`,a:n/10,v:V.bar(n,[{p:10,l:`10% = ${n/10}`}])},{p:`Half of ${n/10} = ?`,a:ans,v:V.bar(n,[{p:5,l:`5% = ${ans}`}])}],size:n}}});
+M({id:'pbuild',belt:'red',name:'Build Percents',icon:'🧩',target:9,pre:'p5',
+  teach:'Build any percent from easy pieces. 15% = 10% + 5%. 20% = 10% twice. 30% = 10% three times. 75% = 50% + 25%.',
+  gen(){const p=pick([15,20,30,40,75,15,20]);let n,st,ans;
+    if(p===75){n=4*ri(5,100);ans=n*3/4;st=[{p:`50% of ${n} = ?`,a:n/2},{p:`25% of ${n} = ?`,a:n/4},{p:`${n/2} + ${n/4} = ?`,a:ans}]}
+    else if(p===15){n=20*ri(2,60);ans=n*.15;st=[{p:`10% of ${n} = ?`,a:n/10},{p:`5% is half of that: ?`,a:n/20},{p:`${n/10} + ${n/20} = ?`,a:ans}]}
+    else{const k=p/10;n=10*ri(3,120);ans=n*k/10;st=[{p:`10% of ${n} = ?`,a:n/10},{p:`${p}% is ${k} × 10%. ${k} × ${n/10} = ?`,a:ans}]}
+    return{q:`${p}% of ${fmt(n)}`,ans,hint:p===75?'50% + 25%':p===15?'10% + 5%':`${p/10} lots of 10%`,v0:V.bar(n,[{p,l:`${p}%`}]),steps:st,size:n}}});
+M({id:'pswap',belt:'red',name:'Swap Trick',icon:'🔀',target:7,pre:'p50',
+  teach:'Secret: x% of y = y% of x. 8% of 50 is hard, but 50% of 8 is easy: 4! Always flip to the easier one.',
+  gen(){const n=pick([50,25,50,20]);let p,ans,st;
+    if(n===50){p=2*ri(2,24);ans=p/2;st=[{p:`Swap it! ${p}% of 50 = 50% of ${p}. 50% of ${p} = ?`,a:ans}]}
+    else if(n===25){p=4*ri(2,12);ans=p/4;st=[{p:`Swap it! ${p}% of 25 = 25% of ${p}. Half of ${p} = ?`,a:p/2},{p:`Half of ${p/2} = ?`,a:ans}]}
+    else{p=10*ri(2,9);ans=p/5;st=[{p:`Swap it! ${p}% of 20 = 20% of ${p}. 10% of ${p} = ?`,a:p/10},{p:`Double ${p/10} = ?`,a:ans}]}
+    return{q:`${p}% of ${n}`,ans,hint:`Swap: ${n}% of ${p} is easier.`,v0:V.eq(`${p}% of ${n} = ${n}% of ${p}`),steps:st,size:n}}});
+
+/* ---------- BLACK (mega) ---------- */
+M({id:'megaadd',belt:'black',name:'Mega Round and Fix',icon:'🌋',target:10,pre:'roundadd',
+  teach:'Works for huge numbers too: 2,346 + 1,998 → add 2,000 (4,346), take back 2 → 4,344.',
+  gen(){const base=ri(1,5)*1000,k=ri(1,5),b=base-k,a=ri(1100,7999),sub=Math.random()<.4&&a>base+100;
+    if(sub){const ans=a-b;return{q:`${fmt(a)} − ${fmt(b)}`,ans,hint:`Take away ${fmt(base)}, then add ${k} back.`,v0:V.eq(`${fmt(a)} − ${fmt(b)}`),steps:[{p:`${fmt(a)} − ${fmt(base)} = ?`,a:a-base},{p:`Give back ${k}: ${fmt(a-base)} + ${k} = ?`,a:ans}],size:a}}
+    const ans=a+b;return{q:`${fmt(a)} + ${fmt(b)}`,ans,hint:`Add ${fmt(base)}, then take ${k} away.`,v0:V.eq(`${fmt(a)} + ${fmt(b)}`),steps:[{p:`${fmt(a)} + ${fmt(base)} = ?`,a:a+base},{p:`Take back ${k}: ${fmt(a+base)} − ${k} = ?`,a:ans}],size:ans}}});
+M({id:'megamul',belt:'black',name:'Mega Multiply',icon:'🏔️',target:12,pre:'split',
+  teach:'347 × 6: split into 300, 40 and 7. 6×300 = 1800, 6×40 = 240, 6×7 = 42. Add: 2,082.',
+  gen(){let a,b;do{a=ri(3,9);b=ri(112,899)}while(O(b)===0||T(b%100)===0);const h=Math.floor(b/100)*100,t=T(b%100),o=O(b),ans=a*b;
+    return{q:`${b} × ${a}`,ans,hint:`Split ${b} into ${h}, ${t} and ${o}.`,v0:V.area([{n:a,l:a}],[{n:4,l:h},{n:2.4,l:t},{n:1.4,l:o}],[['?','?','?']]),
+      steps:[{p:`${a} × ${h} = ?`,a:a*h},{p:`${a} × ${t} = ?`,a:a*t},{p:`${a} × ${o} = ?`,a:a*o},{p:`${fmt(a*h)} + ${a*t} + ${a*o} = ?`,a:ans,v:V.eq(`${b} × ${a} = ${fmt(ans)}`)}],size:ans}}});
+M({id:'megapct',belt:'black',name:'Big Percents',icon:'💎',target:10,pre:'pbuild',
+  teach:'15% of 480: 10% = 48, 5% = 24, total 72. 25% of 1,600 = 400. Same moves, bigger numbers.',
+  gen(){const p=pick([10,15,20,25,5,30]);let n,st;
+    if(p===25){n=4*ri(30,600);st=[{p:`Half of ${fmt(n)} = ?`,a:n/2},{p:`Half again = ?`,a:n/4}]}
+    else if(p===15){n=20*ri(10,150);st=[{p:`10% of ${fmt(n)} = ?`,a:n/10},{p:`5% (half of that) = ?`,a:n/20},{p:`${fmt(n/10)} + ${fmt(n/20)} = ?`,a:n*3/20}]}
+    else if(p===5){n=20*ri(10,150);st=[{p:`10% of ${fmt(n)} = ?`,a:n/10},{p:`Half of ${fmt(n/10)} = ?`,a:n/20}]}
+    else{n=10*ri(30,800);const k=p/10;st=[{p:`10% of ${fmt(n)} = ?`,a:n/10}];if(k>1)st.push({p:`${k} × ${fmt(n/10)} = ?`,a:n*k/10})}
+    return{q:`${p}% of ${fmt(n)}`,ans:st[st.length-1].a,hint:'Find 10% first, then build.',v0:V.bar(n,[{p,l:`${p}%`}]),steps:st,size:n}}});
+M({id:'mega125',belt:'black',name:'Magic 125',icon:'✨',target:9,pre:'x25',
+  teach:'Magic pairs: 125 × 8 = 1000, 25 × 4 = 100, 50 × 2 = 100. 125 × 24 → 24 is 8 × 3, so 1000 × 3 = 3,000.',
+  gen(){const pair=pick([[125,8,1000],[25,4,100],[50,2,100],[250,4,1000]]),k=ri(2,9),b=pair[1]*k,ans=pair[0]*b;
+    return{q:Math.random()<.5?`${pair[0]} × ${b}`:`${b} × ${pair[0]}`,ans,hint:`${b} = ${pair[1]} × ${k}. ${pair[0]} × ${pair[1]} = ${fmt(pair[2])}.`,v0:V.eq(`${pair[0]} × ${pair[1]} = ${fmt(pair[2])}`),
+      steps:[{p:`${b} = ${pair[1]} × ?`,a:k},{p:`${pair[0]} × ${pair[1]} = ?`,a:pair[2]},{p:`${fmt(pair[2])} × ${k} = ?`,a:ans}],size:ans}}});
+
+const MOVE=Object.fromEntries(MOVES.map(m=>[m.id,m]));
+const beltMoves=b=>MOVES.filter(m=>m.belt===b);
+function makeProblem(id){const m=MOVE[id],p=m.gen();p.move=id;p.kind=p.kind||'num';return p}
+// tutorial engine: 4 help levels
+const HELP={NONE:0,HINT:1,STEPS:2,SHOW:3,BACK:4};
+
+/* placement: representative moves per belt */
+const PLACEMENT={white:['maketen','neardoubles'],yellow:['breakten','addtens'],orange:['x5','x4'],green:['x9','x78'],blue:['roundadd','placeadd'],purple:['split','x11'],brown:['twobytwo','sq5'],red:['p10','pbuild'],black:['megamul','megapct']};
+
+if(typeof module!=='undefined')module.exports={MOVES,MOVE,BELTS,beltMoves,makeProblem,PLACEMENT,HELP,fmt};
+
+/* ================= NUMBER DOJO · ART =================
+   Human characters (SVG, poseable) and the teaching visuals.
+*/
+const SKINS=['#ffe3c8','#f7c9a0','#e2a77a','#c4885a','#9b6442','#6b4129'];
+const HAIRC=['#1d1712','#4b2c17','#8a5a2b','#d9a441','#b8431c','#e9e3d6'];
+const HAIRS=['short','spiky','ponytail','bun','long','curly','buzz','afro'];
+const GIS={white:'#f7f5ef',navy:'#2b3f73',sky:'#3a8cff',crimson:'#c62f3b',forest:'#2e8a55',black:'#25262c',gold:'#e0a91e',pink:'#f07ab0',purple:'#7b4fd6',teal:'#18a39a'};
+const BANDS={none:null,red:'#e23b3b',blue:'#2f6fe0',gold:'#f2b90f',green:'#25a35a',black:'#1c1c1f',white:'#ffffff',rainbow:'url(#rbw)'};
+
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0')}
+
+function hairBack(style,c){
+  switch(style){
+    case 'long':return `<path d="M56 66 Q42 118 54 166 L76 160 Q66 124 72 92 Z" fill="${c}"/><path d="M144 66 Q158 118 146 166 L124 160 Q134 124 128 92 Z" fill="${c}"/>`;
+    case 'ponytail':return `<path d="M138 64 Q176 70 168 120 Q164 140 150 146 Q160 116 140 92 Z" fill="${c}"/>`;
+    case 'afro':return `<circle cx="100" cy="66" r="62" fill="${c}"/>`;
+    case 'curly':return `<g fill="${c}">${[[58,70],[66,48],[84,34],[106,30],[128,38],[142,56],[146,78],[54,92],[148,98]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="16"/>`).join('')}</g>`;
+    default:return '';
+  }
+}
+function hairFront(style,c){
+  const d=shade(c,-25);
+  switch(style){
+    case 'short':return `<path d="M54 76 Q52 34 100 30 Q148 34 146 76 Q132 56 104 54 Q76 54 54 76 Z" fill="${c}"/><path d="M80 40 Q96 52 120 44" stroke="${d}" stroke-width="3" fill="none" opacity=".5"/>`;
+    case 'spiky':return `<path d="M54 78 L58 46 L70 54 L74 28 L88 44 L98 22 L108 42 L124 26 L128 50 L142 42 L146 78 Q128 58 100 56 Q72 58 54 78 Z" fill="${c}"/>`;
+    case 'ponytail':return `<path d="M54 80 Q50 32 100 30 Q150 32 146 80 Q140 60 118 56 Q96 66 70 58 Q58 66 54 80 Z" fill="${c}"/><circle cx="142" cy="66" r="7" fill="${shade(c,40)}"/>`;
+    case 'bun':return `<circle cx="100" cy="24" r="18" fill="${c}"/><path d="M54 78 Q50 32 100 32 Q150 32 146 78 Q130 58 100 56 Q70 58 54 78 Z" fill="${c}"/>`;
+    case 'long':return `<path d="M54 84 Q50 30 100 30 Q150 30 146 84 Q140 56 112 52 Q100 66 84 54 Q60 60 54 84 Z" fill="${c}"/>`;
+    case 'curly':return `<g fill="${c}">${[[66,56],[80,46],[96,44],[112,44],[128,50],[138,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="13"/>`).join('')}</g>`;
+    case 'buzz':return `<path d="M56 74 Q54 36 100 34 Q146 36 144 74 Q130 58 100 56 Q70 58 56 74 Z" fill="${c}" opacity=".85"/>`;
+    case 'afro':return `<path d="M58 70 Q70 52 100 50 Q130 52 142 70 Q126 60 100 60 Q74 60 58 70 Z" fill="${d}" opacity=".35"/>`;
+    case 'master':return `<path d="M56 70 Q60 44 100 42 Q140 44 144 70 Q130 60 100 58 Q70 60 56 70 Z" fill="${c}"/><circle cx="100" cy="30" r="14" fill="${c}"/><rect x="92" y="38" width="16" height="6" rx="3" fill="#7a2020"/>`;
+    default:return '';
+  }
+}
+/* look: {skin, hair, hairColor, gi, band, belt, beard, brows} */
+function avatarSVG(look,opts={}){
+  const skin=SKINS[look.skin]??look.skin??SKINS[1],hc=HAIRC[look.hairColor]??look.hairColor??HAIRC[0],gi=GIS[look.gi]||look.gi||GIS.white,giD=shade(gi,-30),
+        belt=look.belt||'#f4f1e8',band=BANDS[look.band]||null,hair=look.hair||'short',skinD=shade(skin,-28);
+  const id='a'+Math.random().toString(36).slice(2,7);
+  const beard=look.beard?`<path d="M64 96 Q70 150 100 162 Q130 150 136 96 Q124 120 100 122 Q76 120 64 96 Z" fill="${hc}"/><path d="M84 112 Q100 104 116 112" stroke="${shade(hc,-30)}" stroke-width="4" fill="none" stroke-linecap="round"/>`:'';
+  const mouth=look.beard?'':`<path d="M90 104 Q100 113 110 104" stroke="#5a2a1c" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  const brows=look.beard?`<path d="M72 70 Q84 62 94 70" stroke="${hc}" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M106 70 Q116 62 128 70" stroke="${hc}" stroke-width="6" fill="none" stroke-linecap="round"/>`
+                         :`<path d="M76 70 Q84 66 92 70" stroke="${shade(hc,-10)}" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M108 70 Q116 66 124 70" stroke="${shade(hc,-10)}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  return `<svg class="av ${opts.cls||''}" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs><linearGradient id="rbw" x1="0" x2="1"><stop offset="0" stop-color="#ff4d4d"/><stop offset=".33" stop-color="#ffd23f"/><stop offset=".66" stop-color="#3cc46a"/><stop offset="1" stop-color="#3a8cff"/></linearGradient>
+  <clipPath id="${id}h"><circle cx="100" cy="78" r="46"/></clipPath></defs>
+  <ellipse cx="100" cy="266" rx="54" ry="9" fill="rgba(0,0,0,.18)" class="shadow"/>
+  <g class="body">
+   <g class="legL"><path d="M76 176 L98 176 L96 248 L78 248 Z" fill="${gi}" stroke="${giD}" stroke-width="2"/><ellipse cx="86" cy="254" rx="13" ry="7" fill="${skin}"/></g>
+   <g class="legR"><path d="M102 176 L124 176 L122 248 L104 248 Z" fill="${gi}" stroke="${giD}" stroke-width="2"/><ellipse cx="114" cy="254" rx="13" ry="7" fill="${skin}"/></g>
+   <g class="upper">
+    <g class="armL"><path d="M66 124 Q50 130 46 172 L62 174 Q64 146 74 136 Z" fill="${gi}" stroke="${giD}" stroke-width="2"/><circle cx="53" cy="182" r="11" fill="${skin}"/></g>
+    <path d="M64 120 Q100 108 136 120 L132 184 L68 184 Z" fill="${gi}" stroke="${giD}" stroke-width="2"/>
+    <path d="M86 118 L100 146 L114 118 Z" fill="${skin}"/>
+    <path d="M84 118 L100 150 L118 120" stroke="${giD}" stroke-width="4" fill="none"/>
+    <path d="M100 150 L80 182" stroke="${giD}" stroke-width="3" fill="none" opacity=".6"/>
+    <rect x="66" y="166" width="68" height="13" rx="4" fill="${belt}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
+    <path d="M96 172 L86 198 L94 199 L100 178 L106 199 L114 198 L104 172 Z" fill="${belt}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
+    <rect x="93" y="164" width="14" height="17" rx="4" fill="${shade(belt.startsWith('#')?belt:'#888888',-15)}"/>
+    <g class="armR"><path d="M134 124 Q150 130 154 172 L138 174 Q136 146 126 136 Z" fill="${gi}" stroke="${giD}" stroke-width="2"/><circle cx="147" cy="182" r="11" fill="${skin}"/></g>
+    <g class="head">
+     ${hairBack(hair,hc)}
+     <circle cx="56" cy="84" r="9" fill="${skin}"/><circle cx="144" cy="84" r="9" fill="${skin}"/>
+     <circle cx="100" cy="78" r="46" fill="${skin}"/>
+     <ellipse cx="100" cy="122" rx="12" ry="5" fill="${skinD}" opacity=".35"/>
+     ${beard}
+     <g class="eyes"><ellipse cx="84" cy="86" rx="5" ry="7" fill="#1e1a1a"/><ellipse cx="116" cy="86" rx="5" ry="7" fill="#1e1a1a"/><circle cx="86" cy="83" r="2" fill="#fff"/><circle cx="118" cy="83" r="2" fill="#fff"/></g>
+     ${brows}
+     <circle cx="74" cy="100" r="6" fill="#ff8a8a" opacity=".35"/><circle cx="126" cy="100" r="6" fill="#ff8a8a" opacity=".35"/>
+     ${mouth}
+     ${hairFront(hair,hc)}
+     ${band?`<g clip-path="url(#${id}h)"><rect x="50" y="56" width="100" height="11" fill="${band}"/></g><path d="M142 60 Q160 58 170 70 L164 74 Q156 66 142 66 Z M142 62 Q156 70 160 86 L153 86 Q150 72 142 66 Z" fill="${band}"/>`:''}
+    </g>
+   </g>
+  </g>
+  </svg>`;
+}
+const MASTER_LOOK={skin:2,hair:'master',hairColor:'#e9e3d6',gi:'#7a2a24',belt:'#1b1b1f',beard:true};
+const RIVALS=[
+  {name:'Mei',look:{skin:1,hair:'ponytail',hairColor:0,gi:'sky',band:'red'}},
+  {name:'Leo',look:{skin:3,hair:'spiky',hairColor:1,gi:'white',band:'blue'}},
+  {name:'Amara',look:{skin:5,hair:'afro',hairColor:0,gi:'crimson',band:'gold'}},
+  {name:'Kenji',look:{skin:1,hair:'buzz',hairColor:0,gi:'navy',band:'none'}},
+  {name:'Sofia',look:{skin:2,hair:'long',hairColor:2,gi:'forest',band:'white'}},
+  {name:'Omar',look:{skin:4,hair:'short',hairColor:0,gi:'black',band:'red'}},
+  {name:'Priya',look:{skin:3,hair:'bun',hairColor:0,gi:'purple',band:'gold'}},
+  {name:'Jack',look:{skin:0,hair:'curly',hairColor:3,gi:'teal',band:'green'}},
+  {name:'Yuki',look:{skin:0,hair:'short',hairColor:5,gi:'black',band:'rainbow'}}
+];
+
+/* ---------------- teaching visuals ---------------- */
+function renderVis(v){
+  if(!v)return '';
+  const note=v.note?`<div class="vnote">${v.note}</div>`:'';
+  switch(v.type){
+    case 'frames':return `<div class="vis frames">${v.frames.map(f=>`<div class="tf">${f.map(c=>`<i class="${c?'c'+c:''}"></i>`).join('')}</div>`).join('')}</div>${note}`;
+    case 'line':{
+      const W=640,H=150,pad=34,lo=v.from,hi=v.to,sx=x=>pad+(x-lo)/(hi-lo)*(W-2*pad),span=hi-lo;
+      const step=span<=20?1:span<=60?5:span<=200?10:span<=1200?100:1000,lab=span<=20?(span<=12?1:2):step*(span/step>12?2:1);
+      let t='';for(let x=Math.ceil(lo/step)*step;x<=hi;x+=step){const big=x%lab===0;t+=`<line x1="${sx(x)}" y1="${100-(big?10:6)}" x2="${sx(x)}" y2="${100+(big?10:6)}" stroke="#2b3550" stroke-width="${big?2.5:1.5}"/>${big?`<text x="${sx(x)}" y="132" text-anchor="middle" class="lt">${fmt(x)}</text>`:''}`}
+      let j='';(v.jumps||[]).forEach((k,i)=>{const x1=sx(k.from),x2=sx(k.to),mx=(x1+x2)/2,h=Math.min(70,22+Math.abs(x2-x1)*.35),up=k.to>=k.from;
+        j+=`<path d="M${x1} 96 Q${mx} ${96-h*1.6} ${x2} 96" fill="none" stroke="${up?'#ff8a3c':'#3a8cff'}" stroke-width="4" stroke-linecap="round" class="jump" style="animation-delay:${i*.25}s"/><polygon points="${x2-6},${86} ${x2+6},${86} ${x2},${97}" fill="${up?'#ff8a3c':'#3a8cff'}"/><rect x="${mx-26}" y="${96-h*.8-30}" width="52" height="24" rx="12" fill="#fff" stroke="${up?'#ff8a3c':'#3a8cff'}" stroke-width="2"/><text x="${mx}" y="${96-h*.8-13}" text-anchor="middle" class="jl">${k.label}</text>`});
+      const m=v.mark!=null?`<circle cx="${sx(v.mark)}" cy="100" r="9" fill="#ffd23f" stroke="#2b3550" stroke-width="2.5"/>`:'';
+      return `<div class="vis line"><svg viewBox="0 0 ${W} ${H}"><line x1="${pad-10}" y1="100" x2="${W-pad+10}" y2="100" stroke="#2b3550" stroke-width="3"/>${t}${j}${m}</svg></div>${note}`;}
+    case 'area':{
+      const cols=v.cols.map(c=>`${Math.max(.8,Math.sqrt(c.n))}fr`).join(' '),rows=v.rows.map(r=>`${Math.max(.8,Math.sqrt(r.n))}fr`).join(' ');
+      const colors=['#ffe7c2','#cfe6ff','#d8f5df','#f6dcff'];
+      let cells='';v.rows.forEach((r,i)=>v.cols.forEach((c,k)=>{const val=v.vals[i]?.[k];cells+=`<div class="ac" style="background:${colors[(i+k)%4]}">${val==null?'':`<b>${val==='?'?'?':fmt(val)}</b>`}</div>`}));
+      return `<div class="vis area"><div class="atop" style="grid-template-columns:${cols}">${v.cols.map(c=>`<span>${c.l===''?'':fmt(c.l)}</span>`).join('')}</div><div class="amid"><div class="aleft" style="grid-template-rows:${rows}">${v.rows.map(r=>`<span>${r.l===''?'':fmt(r.l)}</span>`).join('')}</div><div class="agrid" style="grid-template-columns:${cols};grid-template-rows:${rows}">${cells}</div></div></div>${note}`;}
+    case 'groups':{const g=Math.min(v.g,12),e=Math.min(v.each,12);let h='';for(let i=0;i<g;i++)h+=`<div class="grow ${v.hl!=null&&i>=v.hl?'dim':''}">${'<i></i>'.repeat(e)}</div>`;return `<div class="vis groups">${h}</div>${note}`}
+    case 'bar':{const segs=Array.from({length:10},(_,i)=>`<i style="left:${i*10}%"></i>`).join('');
+      const parts=(v.parts||[]).map((p,i)=>`<div class="bfill" style="width:${p.p}%;background:${['#ffb84a','#3a8cff','#3cc46a'][i%3]}"><span>${p.l}</span></div>`).join('');
+      return `<div class="vis bar"><div class="btrack">${parts}${segs}</div><div class="blab"><span>0</span><span>100% = ${fmt(v.total)}</span></div></div>${note}`}
+    case 'digits':return `<div class="vis digits">${v.digits.map((d,i)=>`<b class="${(v.hl||[]).includes(i)?'hl':''}">${d}</b>`).join('')}</div>${note}`;
+    case 'eq':return `<div class="vis eq">${v.text}</div>`;
+  }
+  return '';
+}
+
+/* ---------------- boards ---------------- */
+const MATERIALS={pine:{name:'Pine boards',cls:'m-pine'},oak:{name:'Oak boards',cls:'m-oak'},brick:{name:'Bricks',cls:'m-brick'},stone:{name:'Stone slabs',cls:'m-stone'},ice:{name:'Ice blocks',cls:'m-ice'},glass:{name:'Crystal',cls:'m-glass'},gold:{name:'Gold bars',cls:'m-gold'}};
+
+if(typeof module!=='undefined')module.exports={avatarSVG,renderVis};
+
+/* ================= NUMBER DOJO · APP ================= */
+const $=s=>document.querySelector(s);
+const APP=document.getElementById('app');
+const KEY='dojo.v1';
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const addDays=(s,n)=>{const d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- save ---------- */
+let SAVE;
+function defaultSave(){return{v:1,profiles:[],cur:null,settings:{sound:true,music:true,speak:false}}}
+function load(){try{SAVE=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){SAVE=null}if(!SAVE||!Array.isArray(SAVE.profiles))SAVE=defaultSave();SAVE.settings=Object.assign({sound:true,music:true,speak:false},SAVE.settings||{})}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}}
+const P=()=>SAVE.profiles.find(p=>p.id===SAVE.cur)||null;
+function newProfile(name,look){return{id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name,look,coins:0,earned:{},moves:{},created:today(),
+  streak:{n:0,last:''},records:{biggest:0,fast10:null,bestCombo:0},owned:{},equip:{material:null},stats:{solved:0,correct:0,time:0,sessions:0},placed:false,warm:'',rival:{}}}
+function mr(id,p=P()){return p.moves[id]||(p.moves[id]={seen:0,tried:0,strong:0,sessions:0,correct:0,wrong:0,h:[0,0,0,0,0],best:null,ivl:0,next:''})}
+const starsOf=id=>Math.min(3,mr(id).strong);
+const beltIdx=id=>BELTS.findIndex(b=>b.id===id);
+function beltUnlocked(i,p=P()){return i===0||!!p.earned[BELTS[i-1].id]}
+function moveUnlocked(id,p=P()){const m=MOVE[id],bi=beltIdx(m.belt);if(!beltUnlocked(bi,p))return false;const list=beltMoves(m.belt),k=list.indexOf(m);return k===0||mr(list[k-1].id,p).tried>0||mr(id,p).tried>0}
+function beltReady(b,p=P()){return beltMoves(b).every(m=>mr(m.id,p).strong>=1)}
+function curBelt(p=P()){for(let i=0;i<BELTS.length;i++)if(!p.earned[BELTS[i].id])return i;return BELTS.length-1}
+function earnedCount(p=P()){return BELTS.filter(b=>p.earned[b.id]).length}
+function wearBelt(p=P()){let c=BELTS[0].color;BELTS.forEach(b=>{if(p.earned[b.id])c=b.color});return p.earned.white?c:'#f4f1e8'}
+function lookOf(p){return Object.assign({},p.look,{belt:wearBelt(p)})}
+
+/* ---------- audio ---------- */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,type='sine',v=.15,slide=0,delay=0){const a=ac();if(!a||!SAVE.settings.sound)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+delay;o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.05)}
+function noise(d,v=.2,freq=900,delay=0){const a=ac();if(!a||!SAVE.settings.sound)return;const n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;const g=a.createGain();g.gain.value=v;s.connect(f);f.connect(g);g.connect(a.destination);s.start(a.currentTime+delay)}
+const sfx={
+  tap(){tone(660,.05,'triangle',.06)},
+  ok(){tone(660,.1,'triangle',.12);tone(990,.16,'triangle',.12,0,.08)},
+  bad(){tone(220,.22,'sine',.12,-60)},
+  chop(n=1){noise(.08,.25,2400);for(let i=0;i<n;i++){noise(.22,.32,700,.06+i*.05);tone(120,.18,'square',.08,-60,.06+i*.05)}},
+  hint(){tone(520,.12,'sine',.08,120)},
+  coin(){tone(988,.08,'square',.06);tone(1319,.14,'square',.06,0,.07)},
+  win(){[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.13,0,i*.12))},
+  fanfare(){[392,523,659,784,659,784,1047].forEach((f,i)=>tone(f,.3,'triangle',.13,0,i*.14));noise(.6,.1,500,.9)},
+  gong(){tone(110,1.6,'sine',.2,-20);tone(220,1.2,'sine',.08,-30);noise(.4,.08,300)}
+};
+function speak(t){if(!SAVE.settings.speak||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t).replace(/<[^>]+>/g,'').replace(/×/g,' times ').replace(/−/g,' minus ').replace(/÷/g,' divided by ').replace(/%/g,' percent').replace(/\?/g,' what? '));u.rate=.95;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- ui helpers ---------- */
+let toastT=null;
+function toast(msg){document.querySelectorAll('.toast').forEach(e=>e.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),2400)}
+function confetti(n=60){const cs=['#d64545','#f2b90f','#2fa85a','#3a7bdc','#9b5cff','#ff8a3c'];for(let i=0;i<n;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=cs[i%cs.length];c.style.animationDuration=(1.6+Math.random()*1.8)+'s';c.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),4200)}}
+function modal(html,onBind){closeModal();const m=document.createElement('div');m.className='modal';m.id='modal';m.innerHTML=`<div class="panel">${html}</div>`;document.body.appendChild(m);onBind&&onBind(m);return m}
+function closeModal(){const m=$('#modal');if(m)m.remove()}
+function starStr(n){return `<span class="stars">${'★'.repeat(n)}<span class="off">${'★'.repeat(3-n)}</span></span>`}
+function screen(html,cls=''){if(window.chantStop)chantStop();if(window.sparStop)sparStop();if(window.speechSynthesis)try{speechSynthesis.cancel()}catch(e){};S=null;APP.innerHTML=`<div class="screen ${cls}" id="scr"><div class="wrap">${html}</div></div>`;const s=$('#scr');s.scrollTop=0;return s}
+function bind(map){for(const k in map){const el=document.querySelectorAll(k);el.forEach(e=>e.addEventListener('click',ev=>{ac();sfx.tap();map[k](ev,e)}))}}
+function masterHTML(text,cls='idle'){return `<div class="master"><div class="who ${cls}">${avatarSVG(MASTER_LOOK)}</div><div class="bubble">${text}</div></div>`}
+
+const fnum=t=>String(t).replace(/(^|[^\d,.])(\d{4,})(?![\d,])/g,(m,a,n)=>a+Number(n).toLocaleString('en-US'));
+function reveal(s){return fnum(reveal0(s))}
+function reveal0(s){const a=`<b>${fmt(s.a)}</b>`;if(/\s\?$/.test(s.p))return s.p.replace(/\?$/,a);if(/(^|\s)\?(\s|$|\))/.test(s.p)&&/[=+−×÷]\s*\?|\?\s*[=+−×÷]/.test(s.p))return s.p.replace(/(^|\s)\?(?=\s|$|\))/,`$1${a}`);return `${s.p} → ${a}`}
+/* ================= PROFILES ================= */
+function goProfiles(){
+  const cards=SAVE.profiles.map(p=>{const b=BELTS[Math.max(0,earnedCount(p)-1)];return `<div class="pcard" data-p="${p.id}"><div class="pa idle">${avatarSVG(lookOf(p))}</div><b>${esc(p.name)}</b><small>${earnedCount(p)?b.name:'New student'}</small><div class="beltbar" style="background:${wearBelt(p)}"></div></div>`}).join('');
+  screen(`<div class="panel" style="text-align:center;max-width:640px;margin:0 auto"><div class="title">Number <span>Dojo</span></div><div class="sub">Learn secret math moves. Solve big numbers in your head.</div></div>
+  <div class="pgrid">${cards}<div class="pcard new" id="newP"><span>＋</span>New student</div></div>
+  <div class="row center" style="margin-top:20px"><a class="btn small" href="../" style="text-decoration:none">🏠 All games</a><button class="btn small" id="setBtn">⚙️ Settings</button></div>`);
+  bind({'[data-p]':(e,el)=>{SAVE.cur=el.dataset.p;hubPicked=false;persist();goHub()},'#newP':()=>goCreator(),'#setBtn':()=>openSettings()});
+}
+
+/* ================= CREATOR ================= */
+function goCreator(edit){
+  const p=edit?P():null;
+  const look=p?Object.assign({},p.look):{skin:ri(0,5),hair:pick(HAIRS),hairColor:ri(0,4),gi:'white',band:'red'};
+  let name=p?p.name:'';
+  const ownedGi=g=>['white','navy','sky','crimson','forest'].includes(g)||(p&&p.owned['gi:'+g]);
+  const ownedBand=b=>['none','red','blue','green'].includes(b)||(p&&p.owned['band:'+b]);
+  function draw(){
+    const prev=$('#prev');if(prev)prev.innerHTML=avatarSVG(Object.assign({},look,{belt:p?wearBelt(p):'#f4f1e8'}));
+    document.querySelectorAll('[data-k]').forEach(el=>el.classList.toggle('on',String(look[el.dataset.k])===el.dataset.v));
+  }
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:30px">${p?'Change your look':'New student'}</h2></div>
+   <div class="creator" style="margin-top:14px">
+    <div><div class="preview idle" id="prev"></div></div>
+    <div class="panel opt">
+     <h3 style="margin-top:0">Your name</h3><input class="nameinput" id="nm" maxlength="14" placeholder="Type your name" value="${esc(name)}" autocomplete="off">
+     <h3>Skin</h3><div class="swatches">${SKINS.map((c,i)=>`<div class="sw" data-k="skin" data-v="${i}" style="background:${c}"></div>`).join('')}</div>
+     <h3>Hair</h3><div class="swatches">${HAIRS.map(h=>`<div class="sw hairopt" data-k="hair" data-v="${h}">${avatarSVG({skin:look.skin,hair:h,hairColor:look.hairColor,gi:'white'},{cls:'mini'}).replace('viewBox="0 0 200 280"','viewBox="40 0 120 130"')}</div>`).join('')}</div>
+     <h3>Hair color</h3><div class="swatches">${HAIRC.map((c,i)=>`<div class="sw" data-k="hairColor" data-v="${i}" style="background:${c}"></div>`).join('')}</div>
+     <h3>Uniform</h3><div class="swatches">${Object.entries(GIS).map(([k,c])=>`<div class="sw ${ownedGi(k)?'':'locked'}" data-k="gi" data-v="${k}" style="background:${c}">${ownedGi(k)?'':'🔒'}</div>`).join('')}</div>
+     <h3>Headband</h3><div class="swatches">${Object.entries(BANDS).map(([k,c])=>`<div class="sw ${ownedBand(k)?'':'locked'}" data-k="band" data-v="${k}" style="background:${k==='none'?'#fff':k==='rainbow'?'linear-gradient(90deg,#ff4d4d,#ffd23f,#3cc46a,#3a8cff)':c}">${k==='none'?'✕':ownedBand(k)?'':'🔒'}</div>`).join('')}</div>
+     <div class="row" style="margin-top:18px"><button class="btn big primary" id="done">${p?'Save':'Start training'}</button></div>
+    </div></div>`);
+  draw();
+  const nm=$('#nm');nm.addEventListener('input',()=>{name=nm.value});
+  document.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('click',()=>{ac();const k=el.dataset.k,v=el.dataset.v;
+    if(k==='gi'&&!ownedGi(v)){toast('Unlock this uniform in the shop');return}if(k==='band'&&!ownedBand(v)){toast('Unlock this headband in the shop');return}
+    look[k]=(k==='skin'||k==='hairColor')?+v:v;sfx.tap();draw();
+    if(k==='skin'||k==='hairColor')document.querySelectorAll('.hairopt').forEach(h=>{h.innerHTML=avatarSVG({skin:look.skin,hair:h.dataset.v,hairColor:look.hairColor,gi:'white'},{cls:'mini'}).replace('viewBox="0 0 200 280"','viewBox="40 0 120 130"')})}));
+  bind({'#back':()=>p?goHub():goProfiles(),'#done':()=>{
+    name=(nm.value||'').trim();if(!name){toast('Type your name first');nm.focus();return}
+    if(p){p.name=name;p.look=look;persist();goHub();return}
+    const np=newProfile(name,look);SAVE.profiles.push(np);SAVE.cur=np.id;persist();goWelcome()}});
+}
+
+/* ================= WELCOME + PLACEMENT ================= */
+function goWelcome(){
+  const p=P();
+  screen(`<div class="panel" style="max-width:760px;margin:0 auto">${masterHTML(`Welcome to the dojo, <b>${esc(p.name)}</b>! I am Master Ren. Here you will learn secret math moves that let you solve <b>big numbers in your head</b>.<br><br>Do you want a quick test so I can see what you already know?`,'idle pose-bow')}
+   <div class="row center" style="margin-top:20px"><button class="btn big primary" id="test">Quick test (2 min)</button><button class="btn big" id="skip">Start at White Belt</button></div></div>`);
+  bind({'#test':()=>startPlacement(),'#skip':()=>{P().placed=true;persist();goHub()}});
+}
+
+/* ================= HUB ================= */
+let hubBelt=null,hubPicked=false;const NAV=[];
+function suggestion(p=P()){
+  const bi=curBelt(p),b=BELTS[bi];
+  if(p.earned[b.id])return{type:'done',text:'You earned every belt! Keep your moves sharp.'};
+  for(const m of beltMoves(b.id)){const r=mr(m.id,p);if(!r.tried)return{type:'learn',id:m.id,text:`Learn a new move: <b>${m.name}</b>`}}
+  for(const m of beltMoves(b.id)){const r=mr(m.id,p);if(r.strong<1)return{type:'train',id:m.id,text:`Train <b>${m.name}</b> until you break 3 boards`}}
+  return{type:'test',belt:b.id,text:`You are ready for the <b>${b.name} Challenge</b>!`};
+}
+function goHub(){
+  const p=P();if(!p)return goProfiles();
+  if(!hubPicked||hubBelt==null||!beltUnlocked(beltIdx(hubBelt)))hubBelt=BELTS[curBelt(p)].id;
+  const sug=suggestion(p),bi=beltIdx(hubBelt),b=BELTS[bi];
+  const belts=BELTS.map((x,i)=>`<div class="beltpill ${x.id===hubBelt?'sel':''} ${beltUnlocked(i)?'':'locked'}" data-belt="${x.id}"><div class="bk" style="background:${x.color}"></div>${x.name}${p.earned[x.id]?'<span class="done">✓</span>':''}</div>`).join('');
+  const moves=beltMoves(b.id).map(m=>{const un=moveUnlocked(m.id),r=mr(m.id),st=starsOf(m.id);
+    return `<div class="mcard ${un?'':'locked'} ${st>=3?'mastered':''}" data-move="${m.id}"><div class="ico">${un?m.icon:'🔒'}</div><div><b>${m.name}</b>${un?starStr(st):'<small>Locked</small>'}<br><small>${!un?'Learn the move before it':!r.tried?'New move':st>=3?'Mastered':'Train to earn stars'}</small></div></div>`}).join('');
+  const ready=beltReady(b.id),earned=p.earned[b.id];
+  const greet=['Ready to train','Good to see you','Let’s go','Focus and breathe'][new Date().getDate()%4];
+  screen(`<div class="topbar"><a class="iconbtn" href="../" aria-label="All games" title="All games" style="text-decoration:none">🏠</a><div class="me" id="meBtn"><div class="mini">${avatarSVG(lookOf(p))}</div><div><b>${esc(p.name)}</b><small>${earnedCount(p)?BELTS[earnedCount(p)-1].name:'New student'}</small></div></div>
+     <div class="spacer"></div><span class="chip">🪙 ${p.coins}</span><span class="chip" title="Daily streak"><span class="flame">🔥</span>${p.streak.n}</span><button class="iconbtn" id="setBtn" aria-label="Settings">⚙️</button></div>
+   <div class="hubgrid">
+    <div class="panel">${masterHTML(`${greet}, <b>${esc(p.name)}</b>! ${sug.text}.`)}<div class="row" style="margin-top:14px">${sug.btn?`<button class="btn big primary" id="goSug">${sug.btn}</button>`:sug.type==='learn'?`<button class="btn big primary" id="goSug">Learn it ▶</button>`:sug.type==='train'?`<button class="btn big primary" id="goSug">Train ▶</button>`:sug.type==='test'?`<button class="btn big red" id="goSug">Take the challenge ▶</button>`:''}</div></div>
+    <div class="panel"><h3 style="font-size:20px">Your belt path</h3><div class="sub" style="margin:2px 0 8px">${BELTS[curBelt(p)].name}: ${BELTS[curBelt(p)].goal}</div><div class="belts" id="belts">${belts}</div>
+     <div class="bprog"><div class="bprogbar"><i style="width:${Math.round(100*beltMoves(BELTS[curBelt(p)].id).filter(m=>mr(m.id).strong>=1).length/beltMoves(BELTS[curBelt(p)].id).length)}%"></i></div><small>${beltMoves(BELTS[curBelt(p)].id).filter(m=>mr(m.id).strong>=1).length} of ${beltMoves(BELTS[curBelt(p)].id).length} moves trained for your next belt</small></div>
+     <div class="statrow" style="justify-content:flex-start;margin-bottom:0"><div class="stat"><b>${MOVES.filter(m=>starsOf(m.id)>=3).length}</b><small>moves mastered</small></div><div class="stat"><b>${fmt(p.records.biggest)}</b><small>biggest number solved</small></div><div class="stat"><b>${p.records.bestCombo}</b><small>best combo</small></div></div></div>
+   </div>
+   <div class="panel" style="margin-top:16px"><div class="row"><h2 style="font-size:24px">${b.name} moves</h2><div class="spacer"></div>
+     ${earned?'<span class="chip">✓ Belt earned</span>':''}<button class="btn ${ready&&!earned?'red':''} small" id="testBtn" ${beltUnlocked(bi)?'':'disabled'}>🥋 ${b.name} Challenge${ready||earned?'':' (train all moves first)'}</button></div>
+     <div class="sub">${b.goal}</div><div class="mgrid">${moves}</div></div>
+   <div class="navrow" id="nav"></div>`);
+  bind({'#meBtn':()=>goCreator(true),'#setBtn':()=>openSettings(),
+    '[data-belt]':(e,el)=>{const i=beltIdx(el.dataset.belt);if(!beltUnlocked(i)){toast(`Earn the ${BELTS[i-1].name} first`);return}hubBelt=el.dataset.belt;hubPicked=true;goHub()},
+    '[data-move]':(e,el)=>{if(!moveUnlocked(el.dataset.move)){toast('Learn the move before this one first');return}goMove(el.dataset.move)},
+    '#goSug':()=>{if(sug.go)return sug.go();if(sug.type==='learn')goWatch(sug.id);else if(sug.type==='train')goMove(sug.id);else if(sug.type==='test')startTest(sug.belt)},
+    '#testBtn':()=>{if(!beltReady(b.id)&&!earned){toast('Earn at least 1 star on every move first');return}startTest(b.id)}});
+  const sel=document.querySelector('.beltpill.sel');if(sel)sel.scrollIntoView({inline:'center',block:'nearest'});
+  const nav=$('#nav');if(nav){nav.innerHTML=NAV.filter(n=>n.show(p)).map(n=>`<button class="btn rel" data-nav="${n.id}"><span>${n.icon}</span>${n.label}${n.badge&&n.badge(p)?`<i class="badge">${n.badge(p)}</i>`:''}</button>`).join('');nav.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{ac();sfx.tap();NAV.find(n=>n.id===b.dataset.nav).go()}))}
+}
+
+/* ================= MOVE SCREEN ================= */
+function goMove(id){
+  const m=MOVE[id],r=mr(id),st=starsOf(id);
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><div class="movehead"><div class="ico">${m.icon}</div><div><h2 style="font-size:32px">${m.name}</h2><div>${starStr(st)} <small style="font-weight:800;color:var(--ink2)">${BELTS[beltIdx(m.belt)].name}</small></div></div></div></div>
+   <div class="panel" style="margin-top:14px">${masterHTML(m.teach)}</div>
+   <div class="steps3">
+    <div class="stepbtn ${r.seen?'done':''}" id="w"><span>👀</span><b>1. Watch</b><small>See the move</small></div>
+    <div class="stepbtn ${r.tried?'done':''}" id="t"><span>✍️</span><b>2. Try</b><small>5 problems with help</small></div>
+    <div class="stepbtn ${r.tried?'':'locked'} ${st>=3?'done':''}" id="tr"><span>🪵</span><b>3. Train</b><small>${r.tried?`Board breaking · ${Math.min(r.strong,3)}/3 strong`:'Try it first'}</small></div>
+   </div>
+   ${m.pre?`<div class="row center" style="margin-top:14px"><small style="font-weight:800;color:var(--ink2)">This move builds on <b>${MOVE[m.pre].name}</b>.</small><button class="btn small" id="pre">Practice ${MOVE[m.pre].name}</button></div>`:''}`);
+  bind({'#back':()=>goHub(),'#w':()=>goWatch(id),'#t':()=>startTry(id),'#tr':()=>{if(!mr(id).tried){toast('Do the Try step first');return}startTrain(id)},'#pre':()=>startTry(m.pre,{returnTo:id})});
+}
+
+/* ================= WATCH (demo) ================= */
+function goWatch(id,then){
+  const m=MOVE[id],p=makeProblem(id);let k=-1;
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:28px">${m.icon} ${m.name}</h2></div>
+   <div class="panel" style="margin-top:12px">${masterHTML(m.teach,'idle')}</div>
+   <div class="panel" style="margin-top:14px;text-align:center"><div class="sub" style="margin:0">Watch me solve one:</div><div class="qcard" style="box-shadow:none;border:none"><div class="q ${p.q.length>14?'long':''}">${p.q}</div></div>
+    <div id="vis">${renderVis(p.v0)}</div><div class="steplist" id="sl"></div>
+    <div class="row center"><button class="btn big primary" id="nx">Show step 1 ▶</button></div></div>`);
+  speak(m.teach);
+  const draw=()=>{const sl=$('#sl');sl.innerHTML=p.steps.slice(0,k+1).map((s,i)=>`<div class="${i===k?'cur':'done'}">${reveal(s)}</div>`).join('');
+    const v=k>=0?(p.steps[k].v||null):p.v0;if(v)$('#vis').innerHTML=renderVis(v);
+    $('#nx').textContent=k<p.steps.length-1?`Show step ${k+2} ▶`:'Now you try! ✍️'};
+  bind({'#back':()=>goMove(id),'#nx':()=>{if(k<p.steps.length-1){k++;draw();sfx.hint();speak(p.steps[k].p.replace('?',String(p.steps[k].a)))}else{mr(id).seen=1;persist();then?then():startTry(id)}}});
+}
+
+/* ================= SESSIONS =================
+   modes: try (help ladder), train (boards, quick correction), test (belt challenge), place (placement), warm (daily), spar
+*/
+let S=null;
+function newSession(o){return Object.assign({idx:0,results:[],input:'',phase:'answer',level:0,step:0,showCount:0,boards:0,combo:0,bestCombo:0,misses:0,times:[]},o)}
+function startTry(id,opt={}){S=newSession({mode:'try',moveId:id,total:5,returnTo:opt.returnTo||null,gen:()=>makeProblem(id)});runSession()}
+function startTrain(id){S=newSession({mode:'train',moveId:id,total:10,gen:()=>makeProblem(id)});runSession()}
+function startTest(beltId){const ids=beltMoves(beltId).map(m=>m.id);const order=shuffle(ids.concat(Array.from({length:Math.max(0,12-ids.length)},()=>pick(ids))));
+  S=newSession({mode:'test',beltId,total:12,order,gen:()=>makeProblem(S.order[S.idx%S.order.length])});runSession()}
+function startPlacement(){const seq=[];BELTS.forEach(b=>PLACEMENT[b.id].forEach(id=>seq.push({belt:b.id,id})));
+  S=newSession({mode:'place',seq,total:seq.length,passed:[],gen:()=>makeProblem(S.seq[S.idx].id)});runSession()}
+
+function sessTitle(){const m=S.moveId?MOVE[S.moveId]:null;return S.mode==='try'?`✍️ Try: ${m.name}`:S.mode==='train'?`🪵 Train: ${m.name}`:S.mode==='test'?`🥋 ${BELTS[beltIdx(S.beltId)].name} Challenge`:S.mode==='place'?'📝 Quick test':S.mode==='warm'?'🔥 Daily warm-up':S.mode==='spar'?'🤜 Sparring':''}
+function materialCls(){const p=P(),eq=p.equip.material;if(eq)return MATERIALS[eq].cls;const m=S.moveId?MOVE[S.moveId]:null,b=m?m.belt:S.beltId||BELTS[curBelt()].id;return MATERIALS[BELTS[beltIdx(b)].material].cls}
+
+function runSession(){
+  const p=P();
+  APP.innerHTML=`<div class="screen" id="scr"><div class="wrap" style="max-width:1180px;margin-top:0"><div class="sess">
+   <div class="sbar"><button class="iconbtn" id="quit" aria-label="Quit">✕</button><b style="font-size:18px">${sessTitle()}</b><div class="spacer"></div><div class="pdots" id="dots"></div></div>
+   <div class="arena ${materialCls()}" id="arena"></div>
+   <div class="qside"><div class="qcard"><div class="qlabel" id="ql"></div><div class="q" id="q"></div><div class="ansbox" id="ab"></div></div><div id="help"></div><div id="padwrap"></div><div class="helpbar" id="helpbar"></div></div>
+  </div></div></div>`;
+  $('#quit').addEventListener('click',()=>{sfx.tap();if(S&&S.idx>0&&S.mode!=='place'){modal(`<h2>Leave training?</h2><p class="sub">Your progress in this round won't count.</p><div class="row center" style="margin-top:14px"><button class="btn big" id="stay">Keep going</button><button class="btn big red" id="leave">Leave</button></div>`,m=>{m.querySelector('#stay').onclick=closeModal;m.querySelector('#leave').onclick=()=>{closeModal();exitSession()}})}else exitSession()});
+  nextProblem();
+}
+function exitSession(){if(window.sparStop)sparStop();const s=S;S=null;if(!s)return goHub();if(s.mode==='try'||s.mode==='train')return goMove(s.moveId);if(s.mode==='place'){P().placed=true;persist()}goHub()}
+function drawDots(){const d=$('#dots');if(!d)return;if(S.mode==='spar'){d.innerHTML='';return}let h='';for(let i=0;i<S.total;i++){const r=S.results[i];h+=`<i class="${r?r.ok?(r.help?'help':'ok'):'bad':''} ${i===S.idx?'now':''}"></i>`}d.innerHTML=h}
+function drawArena(state){
+  const a=$('#arena');if(!a)return;const p=P();
+  const m=S.prob&&MOVE[S.prob.move],scroll=m?`<div class="scroll"><span>${m.icon}</span>${m.name}</div>`:'';
+  if(S.mode==='try'){a.innerHTML=`${scroll}<div class="fighter p1 idle" id="me">${avatarSVG(lookOf(p))}</div><div class="fighter p2 idle flip" id="mstr">${avatarSVG(MASTER_LOOK)}</div>`;return}
+  if(S.mode==='spar'&&window.sparArena)return sparArena(a);
+  let boards='';for(let i=0;i<3;i++)boards+=`<div class="board" data-b="${i}"></div>`;
+  a.innerHTML=`${scroll}<div class="fighter p1 idle" id="me">${avatarSVG(lookOf(p))}</div><div class="stand" id="stand"><div class="stack" id="stack">${boards}</div><div class="blocks"><i></i><i></i></div></div>`;
+}
+function nextProblem(){
+  if(S.over||S.idx>=S.total)return finishSession();
+  S.prob=S.gen();S.input='';S.phase='answer';S.level=0;S.step=0;S.t0=performance.now();S.helpUsed=false;S.showUsedThis=false;
+  drawDots();drawArena();
+  $('#ql').textContent=S.mode==='place'?`Question ${S.idx+1} of ${S.total}`:S.mode==='spar'?`Round ${S.idx+1} · answer before ${S.rival.name}!`:`Problem ${S.idx+1} of ${S.total}`;
+  const q=$('#q');q.textContent=S.prob.q;q.className='q'+(S.prob.q.length>16?' long':'');
+  $('#help').innerHTML='';drawInput();drawHelpBar();speak(S.prob.q);
+  if(S.mode==='spar')sparStart();
+}
+function drawHelpBar(){const hb=$('#helpbar');if(!hb)return;
+  if(S.mode==='try'||S.mode==='train'){hb.innerHTML=`<button class="btn small" id="teach">🧑‍🏫 Teach me</button>${S.mode==='try'&&S.phase==='answer'?`<button class="btn small" id="hintb">💡 Hint</button>`:''}`;
+    const t=$('#teach');t&&t.addEventListener('click',()=>{sfx.tap();if(S.phase==='show')return;S.helpUsed=true;if(S.mode==='train')S.trainHelp=true;enterShow()});
+    const h=$('#hintb');h&&h.addEventListener('click',()=>{sfx.tap();S.helpUsed=true;if(S.level<1)S.level=1;showHint()})}
+  else hb.innerHTML='';
+}
+function curKind(){if(S.phase==='steps'){const st=S.prob.steps[S.step];return st.kind||'num'}return S.prob.kind}
+function drawInput(){
+  const pw=$('#padwrap');if(!pw)return;const ab=$('#ab');ab.className='ansbox';
+  if(S.phase==='show'||S.phase==='fix'){pw.innerHTML='';ab.textContent=S.phase==='fix'?fmt(S.prob.ans):'…';return}
+  if(curKind()==='yn'){ab.textContent=S.input||'?';pw.innerHTML=`<div class="ynpad"><button class="btn big green" data-yn="yes">Yes ✓</button><button class="btn big red" data-yn="no">No ✕</button></div>`;
+    pw.querySelectorAll('[data-yn]').forEach(b=>b.addEventListener('click',()=>{ac();S.input=b.dataset.yn;submit()}));return}
+  ab.textContent=S.input?fmt(Number(S.input)):' ';
+  pw.innerHTML=`<div class="pad">${[7,8,9,4,5,6,1,2,3].map(n=>`<button data-n="${n}">${n}</button>`).join('')}<button class="del" data-n="del">⌫</button><button data-n="0">0</button><button class="go" data-n="go">✓</button></div>`;
+  pw.querySelectorAll('[data-n]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();ac();key(b.dataset.n)}));
+}
+function key(k){if(!S||S.lock)return;if(S.phase==='show'||S.phase==='fix')return;if(curKind()==='yn')return;
+  if(k==='del'){S.input=S.input.slice(0,-1);sfx.tap()}else if(k==='go'){if(S.input!=='')submit();return}else if(/^\d$/.test(k)){if(S.input.length<7){S.input=(S.input==='0'?'':S.input)+k;sfx.tap()}}
+  const ab=$('#ab');if(ab){ab.className='ansbox';ab.textContent=S.input?fmt(Number(S.input)):' '}}
+document.addEventListener('keydown',e=>{if(!S||$('#modal'))return;if(/^\d$/.test(e.key))key(e.key);else if(e.key==='Backspace'){e.preventDefault();key('del')}else if(e.key==='Enter'){key('go')}
+  else if(curKind&&S&&curKind()==='yn'&&(e.key==='y'||e.key==='n')){S.input=e.key==='y'?'yes':'no';submit()}});
+
+function val(){return curKind()==='yn'?S.input:Number(S.input)}
+function submit(){
+  if(!S||S.lock)return;const v=val(),ab=$('#ab');
+  if(S.phase==='steps'){const st=S.prob.steps[S.step];
+    if(v===st.a){sfx.ok();S.step++;S.input='';if(S.step>=S.prob.steps.length){problemDone(true);return}drawSteps();drawInput();return}
+    sfx.bad();ab.className='ansbox bad';S.input='';
+    if(!S.showUsedThis){setTimeout(()=>enterShow(),450);return}
+    // already watched once: reveal this step and move on
+    toast(`It's ${fmt(st.a)}. Keep going!`);S.step++;S.revealed=true;if(S.step>=S.prob.steps.length){problemDone(true);return}setTimeout(()=>{drawSteps();drawInput()},500);return}
+  const ok=v===S.prob.ans,dt=(performance.now()-S.t0)/1000;
+  if(ok){ab.className='ansbox ok';ab.textContent=fmt(S.prob.ans);problemDone(false,dt);return}
+  ab.className='ansbox bad';sfx.bad();S.input='';pose('#me','pose-oops');
+  if(S.mode==='try'){S.helpUsed=true;S.level++;if(S.level===1){showHint();setTimeout(drawInput,350)}else enterSteps();return}
+  if(S.mode==='place'){record(false,dt);S.lock=true;setTimeout(()=>{S.lock=false;placementFail()},700);return}
+  if(S.mode==='spar'){S.misses++;S.combo=0;record(false,dt);return sparPoint(false,dt)}
+  // train / test / warm: immediate correction
+  S.misses++;S.combo=0;record(false,dt);enterFix();
+}
+function pose(sel,cls,ms=900){const el=$(sel);if(!el)return;el.classList.remove('pose-chop','pose-kick','pose-punch','pose-bow','pose-cheer','pose-oops');void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el&&el.classList.remove(cls),ms)}
+function showHint(){sfx.hint();$('#help').innerHTML=`<div class="helpbox"><span class="lvl">💡 Hint</span>${masterHTMLsmall(S.prob.hint)}</div>`;speak(S.prob.hint)}
+function masterHTMLsmall(t){return `<div class="master" style="margin-top:8px"><div class="who idle" style="width:70px;height:98px">${avatarSVG(MASTER_LOOK)}</div><div class="bubble" style="font-size:17px">${t}</div></div>`}
+function enterSteps(){S.phase='steps';S.step=0;S.input='';S.helpUsed=true;drawSteps();drawInput();drawHelpBar()}
+function drawSteps(){const pr=S.prob,st=pr.steps[S.step];let v=pr.v0;for(let i=0;i<S.step;i++)if(pr.steps[i].v)v=pr.steps[i].v;
+  $('#help').innerHTML=`<div class="helpbox"><span class="lvl">🪜 Step by step</span>${renderVis(v)}<div class="steplist">${pr.steps.map((s,i)=>i<S.step?`<div class="done">${reveal(s)} ✓</div>`:i===S.step?`<div class="cur">${fnum(s.p)}</div>`:'').join('')}</div></div>`;
+  $('#ql').textContent=`Step ${S.step+1} of ${pr.steps.length} — type the answer to the yellow step`;speak(st.p)}
+function enterShow(){S.phase='show';S.level=Math.max(S.level,3);S.showUsedThis=true;S.showCount++;S.helpUsed=true;let k=-1;const pr=S.prob;
+  const draw=()=>{const v=k>=0?(pr.steps[k].v||null):pr.v0;
+    $('#help').innerHTML=`<div class="helpbox"><span class="lvl">🧑‍🏫 Watch me</span>${masterHTMLsmall(k<0?MOVE[pr.move].teach:'Watch this step.')}<div id="sv">${renderVis(v||pr.v0)}</div><div class="steplist">${pr.steps.slice(0,k+1).map((s,i)=>`<div class="${i===k?'cur':'done'}">${reveal(s)}</div>`).join('')}</div><div class="row center"><button class="btn primary" id="snx">${k<pr.steps.length-1?`Show step ${k+2} ▶`:'Now you try ✍️'}</button></div></div>`;
+    $('#snx').addEventListener('click',()=>{ac();if(k<pr.steps.length-1){k++;sfx.hint();speak(pr.steps[k].p.replace('?',String(pr.steps[k].a)));draw()}else{
+      if(S.mode==='train'||S.mode==='warm'){S.misses++;record(false,99,true);S.lock=false;S.idx++;nextProblem();return}
+      enterSteps()}})};
+  $('#ql').textContent='Watch the move step by step';drawInput();drawHelpBar();draw();pose('#mstr','pose-bow',1200)}
+function enterFix(){S.phase='fix';S.lock=false;const pr=S.prob;$('#helpbar').innerHTML='';
+  $('#help').innerHTML=`<div class="helpbox"><span class="lvl">🧑‍🏫 Here's how</span><div class="steplist">${pr.steps.map(s=>`<div class="done">${reveal(s)}</div>`).join('')}</div><div class="row center"><button class="btn primary" id="got">Got it ▶</button></div></div>`;
+  drawInput();$('#ql').textContent=`The answer is ${fmt(pr.ans)}`;
+  $('#got').addEventListener('click',()=>{ac();sfx.tap();S.idx++;nextProblem()});
+}
+function record(ok,dt,help){S.results[S.idx]={ok,help:!!help||S.helpUsed,t:dt,move:S.prob.move};const r=mr(S.prob.move);if(ok)r.correct++;else r.wrong++;r.h[Math.min(4,S.level)]++;
+  const p=P();p.stats.solved++;if(ok){p.stats.correct++;p.stats.time+=Math.min(dt,60);if(S.prob.kind==='num'&&!help&&!S.helpUsed&&S.prob.size>p.records.biggest)p.records.biggest=S.prob.size}}
+function problemDone(viaSteps,dt){
+  S.lock=true;dt=dt??(performance.now()-S.t0)/1000;const helped=viaSteps||S.helpUsed;
+  record(true,dt,helped);sfx.ok();
+  if(S.mode==='try'){pose('#me','pose-cheer',1400);pose('#mstr','pose-bow',1200);S.combo=0;
+    $('#help').innerHTML=`<div class="helpbox">${masterHTMLsmall(helped?pick(['Yes! You did it step by step.','Great work! Now try the next one.','That is the move!']):pick(['Perfect!','Excellent! Fast and right.','A true student of the dojo!']))}</div>`;
+    setTimeout(()=>{S.lock=false;S.idx++;if(S.showCount>=2&&MOVE[S.moveId].pre&&!S.offeredBack&&S.idx<S.total){S.offeredBack=true;offerBack()}else nextProblem()},helped?1300:900);return}
+  if(S.mode==='place'){S.lock=false;const item=S.seq[S.idx];const limit=Math.max(12,MOVE[item.id].target*3);if(dt>limit){S.results[S.idx].ok=false;placementFail();return}
+    S.idx++;if(S.idx%2===0)S.passed.push(item.belt);nextProblem();return}
+  if(S.mode==='spar')return sparPoint(true,dt);
+  // board break
+  const m=MOVE[S.prob.move],n=dt<=m.target?3:dt<=m.target*2?2:1;S.combo++;S.bestCombo=Math.max(S.bestCombo,S.combo);S.boards+=n;S.times.push(dt);
+  breakBoards(n,()=>{S.lock=false;S.idx++;nextProblem()});
+}
+function breakBoards(n,done){
+  pose('#me',n===3?'pose-kick':'pose-chop',700);
+  setTimeout(()=>{sfx.chop(n);const st=$('#stack'),ar=$('#arena');if(!st||!ar){done&&done();return}
+    const boards=[...st.querySelectorAll('.board')].reverse().slice(0,n);const ab=ar.getBoundingClientRect();
+    boards.forEach((b,i)=>{const r=b.getBoundingClientRect();const cs=getComputedStyle(b);
+      for(const side of [-1,1]){const pc=document.createElement('div');pc.className='piece';pc.style.cssText=`left:${r.left-ab.left+(side>0?r.width/2:0)}px;top:${r.top-ab.top}px;width:${r.width/2}px;height:${r.height}px;background:${cs.background};border-color:${cs.borderColor};transition:transform .7s cubic-bezier(.2,.6,.4,1),opacity .7s`;ar.appendChild(pc);
+        requestAnimationFrame(()=>{pc.style.transform=`translate(${side*(40+i*20)}px,${90+i*20}px) rotate(${side*(35+i*15)}deg)`;pc.style.opacity='0'});setTimeout(()=>pc.remove(),800)}
+      for(let k=0;k<6;k++){const c=document.createElement('i');c.className='chip-p';c.style.left=(r.left-ab.left+r.width/2)+'px';c.style.top=(r.top-ab.top)+'px';c.style.transition='transform .6s ease-out,opacity .6s';ar.appendChild(c);requestAnimationFrame(()=>{c.style.transform=`translate(${(Math.random()-.5)*160}px,${-40-Math.random()*60}px) rotate(${Math.random()*360}deg)`;c.style.opacity='0'});setTimeout(()=>c.remove(),700)}
+      b.classList.add('broken')});
+    const fx=document.createElement('div');fx.className='hitfx';fx.textContent=n===3?'⚡ 3 BOARDS!':n===2?'2 boards!':'1 board';fx.style.left='48%';fx.style.top='14%';ar.appendChild(fx);setTimeout(()=>fx.remove(),1000);
+    if(S.combo>=3&&S.combo%3===0){const c=document.createElement('div');c.className='hitfx';c.style.cssText='left:6%;top:4%;color:#c48f00';c.textContent=`🔥 ${S.combo} in a row!`;ar.appendChild(c);setTimeout(()=>c.remove(),1000);sfx.coin()}
+    setTimeout(()=>done&&done(),850)},260);
+}
+function placementFail(){S.lock=true;finishPlacement()}
+function offerBack(){const pre=MOVE[MOVE[S.moveId].pre];
+  modal(`${masterHTML(`This move stands on <b>${pre.name}</b>. Let's power up that move first, then come back. Strong roots, strong tree!`,'idle')}<div class="row center" style="margin-top:14px"><button class="btn big primary" id="pw">Power up ${pre.icon}</button><button class="btn big" id="kg">Keep going</button></div>`,m=>{
+    m.querySelector('#pw').onclick=()=>{closeModal();startTry(pre.id,{returnTo:S.moveId})};m.querySelector('#kg').onclick=()=>{closeModal();nextProblem()}})}
+
+/* ---------- finish ---------- */
+function finishSession(){
+  const s=S,p=P();S=null;p.stats.sessions++;touchStreak(p);
+  const ok=s.results.filter(r=>r&&r.ok).length,clean=s.results.filter(r=>r&&r.ok&&!r.help).length;
+  if(s.mode==='try'){const r=mr(s.moveId);const first=!r.tried;r.tried=1;r.seen=1;p.coins+=5;persist();sfx.win();
+    if(s.returnTo){modal(`${masterHTML(`Powered up! Now back to <b>${MOVE[s.returnTo].name}</b>.`,'idle pose-cheer')}<div class="row center" style="margin-top:14px"><button class="btn big primary" id="ok">Let's go ▶</button></div>`,m=>m.querySelector('#ok').onclick=()=>{closeModal();startTry(s.returnTo)});return}
+    modal(`<h2 style="font-size:30px">${first?'New move learned!':'Nice practice!'}</h2><div style="font-size:64px">${MOVE[s.moveId].icon}</div><h3>${MOVE[s.moveId].name}</h3>
+      <div class="statrow"><div class="stat"><b>${ok}/${s.total}</b><small>solved</small></div><div class="stat"><b>${clean}</b><small>without help</small></div><div class="stat"><b>+5</b><small>coins</small></div></div>
+      <p class="sub">Now train it! Break 3 boards by answering fast.</p><div class="row center"><button class="btn big primary" id="tr">Train 🪵</button><button class="btn big" id="hb">Dojo</button></div>`,m=>{
+      m.querySelector('#tr').onclick=()=>{closeModal();startTrain(s.moveId)};m.querySelector('#hb').onclick=()=>{closeModal();goHub()}});return}
+  if(s.mode==='train'){const r=mr(s.moveId),m=MOVE[s.moveId],times=s.times,avg=times.length?times.reduce((a,b)=>a+b,0)/times.length:99;
+    const strong=ok>=8&&avg<=m.target*1.8;r.sessions++;const before=Math.min(3,r.strong);
+    if(strong){r.strong++;r.ivl=r.ivl?Math.min(32,r.ivl*2):1;r.next=addDays(today(),r.ivl)}else if(ok<6){r.ivl=0;r.next=today()}
+    if(times.length&&(r.best==null||avg<r.best))r.best=+avg.toFixed(1);
+    if(s.bestCombo>p.records.bestCombo)p.records.bestCombo=s.bestCombo;
+    const coins=s.boards+ok;p.coins+=coins;persist();const after=Math.min(3,r.strong);
+    if(strong)sfx.win();if(after>before&&after===3){sfx.fanfare();confetti()}
+    const advice=strong?(after>=3?'You mastered this move!':'Strong session! Train again to earn the next star.'):ok<6?'This one is tricky. Watch the move again, then try.':avg>m.target*1.8?'All right answers? Great. Now go a little faster to break more boards.':'Almost! Get 8 right to earn a star.';
+    modal(`<h2 style="font-size:30px">${strong?'Strong session!':'Good training'}</h2><div class="bigstars">${'★'.repeat(after)}<span class="off">${'★'.repeat(3-after)}</span></div>
+      <div class="statrow"><div class="stat"><b>${ok}/10</b><small>correct</small></div><div class="stat"><b>${s.boards}</b><small>boards broken</small></div><div class="stat"><b>${times.length?avg.toFixed(1)+'s':'—'}</b><small>avg time</small></div><div class="stat"><b>+${coins}</b><small>coins</small></div></div>
+      <p class="sub">${advice}</p><div class="row center">${ok<6?`<button class="btn big primary" id="wa">Watch again 👀</button>`:`<button class="btn big primary" id="again">Train again 🪵</button>`}<button class="btn big" id="hb">Dojo</button></div>`,mm=>{
+      const a=mm.querySelector('#again');a&&(a.onclick=()=>{closeModal();startTrain(s.moveId)});const w=mm.querySelector('#wa');w&&(w.onclick=()=>{closeModal();goWatch(s.moveId)});mm.querySelector('#hb').onclick=()=>{closeModal();goHub()}});return}
+  if(s.mode==='test'){const pass=ok>=10,b=BELTS[beltIdx(s.beltId)];
+    if(pass&&!p.earned[b.id]){p.earned[b.id]=today();p.coins+=50;persist();return beltCeremony(b,ok)}
+    persist();if(pass){sfx.win();confetti(30)}
+    const missed=[...new Set(s.results.filter(r=>r&&!r.ok).map(r=>r.move))];
+    modal(`<h2 style="font-size:30px">${pass?'Challenge passed!':'Not yet — so close!'}</h2><div class="statrow"><div class="stat"><b>${ok}/12</b><small>correct</small></div><div class="stat"><b>10</b><small>needed</small></div></div>
+      ${missed.length?`<p class="sub">Practice these moves: ${missed.map(id=>`<b>${MOVE[id].name}</b>`).join(', ')}</p>`:''}<div class="row center"><button class="btn big primary" id="hb">Back to the dojo</button></div>`,m=>m.querySelector('#hb').onclick=()=>{closeModal();goHub()});return}
+  if(s.mode==='place')return finishPlacement(s);
+  if(window.finishExtra)return finishExtra(s,ok);
+}
+function finishPlacement(s){s=s||S;S=null;const p=P();const passed=[];
+  for(const b of BELTS){const ids=PLACEMENT[b.id];const res=s.results.filter((r,i)=>r&&s.seq[i].belt===b.id);if(res.length===ids.length&&res.every(r=>r.ok))passed.push(b.id);else break}
+  passed.forEach(bid=>{p.earned[bid]=today();beltMoves(bid).forEach(m=>{const r=mr(m.id);r.seen=1;r.tried=1;r.strong=Math.max(r.strong,1);r.ivl=r.ivl||2;r.next=addDays(today(),2)})});
+  p.placed=true;persist();hubBelt=null;
+  const start=BELTS[curBelt(p)];
+  modal(`${masterHTML(passed.length?`Impressive! You already know the <b>${BELTS[beltIdx(passed[passed.length-1])].name}</b> moves. You start training for the <b>${start.name}</b>.`:`Great start! Every master began as a white belt. You start with the <b>White Belt</b> moves.`,'idle pose-bow')}
+    <div class="row center" style="margin-top:14px"><button class="btn big primary" id="ok">Enter the dojo ▶</button></div>`,m=>m.querySelector('#ok').onclick=()=>{closeModal();goHub()});
+}
+function beltCeremony(b,score){sfx.fanfare();confetti(90);const p=P();
+  modal(`<h2 style="font-size:34px">${b.name} earned!</h2><div style="height:220px;width:160px;margin:6px auto" class="idle pose-cheer">${avatarSVG(lookOf(p))}</div>
+   ${masterHTML(`Bow to your class, <b>${esc(p.name)}</b>. New skill unlocked: <b>${b.goal}</b>.`,'idle pose-bow')}
+   <div class="statrow"><div class="stat"><b>${score}/12</b><small>challenge score</small></div><div class="stat"><b>+50</b><small>coins</small></div></div>
+   <div class="row center"><button class="btn big primary" id="ok">Continue ▶</button></div>`,m=>m.querySelector('#ok').onclick=()=>{closeModal();hubBelt=null;goHub()});
+}
+function touchStreak(p){const t=today();if(p.streak.last===t)return;const y=addDays(t,-1);p.streak.n=p.streak.last===y?p.streak.n+1:Math.max(1,Math.floor(p.streak.n/2));p.streak.last=t}
+
+/* ---------- settings ---------- */
+function openSettings(){const s=SAVE.settings;
+  modal(`<h2>Settings</h2><div style="display:flex;flex-direction:column;gap:10px;margin:16px 0;text-align:left">
+    <label class="btn" style="justify-content:space-between"><span>🔊 Sound</span><input type="checkbox" id="s1" ${s.sound?'checked':''} style="width:26px;height:26px"></label>
+    <label class="btn" style="justify-content:space-between"><span>🗣️ Read questions aloud</span><input type="checkbox" id="s2" ${s.speak?'checked':''} style="width:26px;height:26px"></label>
+    ${P()?`<button class="btn" id="sw">👥 Switch student</button><button class="btn" id="ed">🎨 Change my look</button>`:''}</div>
+    <button class="btn big primary" id="ok">Done</button>`,m=>{
+    m.querySelector('#s1').onchange=e=>{s.sound=e.target.checked;persist()};m.querySelector('#s2').onchange=e=>{s.speak=e.target.checked;persist()};
+    const sw=m.querySelector('#sw');sw&&(sw.onclick=()=>{closeModal();goProfiles()});const ed=m.querySelector('#ed');ed&&(ed.onclick=()=>{closeModal();goCreator(true)});
+    m.querySelector('#ok').onclick=()=>{closeModal();if(P()&&!S)goHub()}})}
+
+
+/* ================= PHASE 2 · SPARRING + TIMES-TABLE CHANT ================= */
+
+/* ---------- SPARRING ---------- */
+let sparRAF=null;
+function sparOpponent(){const p=P(),bi=Math.min(curBelt(p),RIVALS.length-1);return Object.assign({},RIVALS[bi],{idx:bi,belt:BELTS[Math.min(bi,BELTS.length-1)].color})}
+function sparPool(){const p=P(),cb=BELTS[curBelt(p)].id,pool=[];MOVES.forEach(m=>{const r=mr(m.id,p);if(!r.tried)return;const w=m.belt===cb?3:1;for(let i=0;i<w;i++)pool.push(m.id)});return pool}
+function startSpar(){const pool=sparPool();if(new Set(pool).size<2){toast('Learn at least 2 moves before sparring');return}
+  const riv=sparOpponent(),rec=P().rival[riv.name]||{};
+  S=newSession({mode:'spar',total:99,rival:riv,ps:0,rs:0,pool,factor:rec.factor||1.6,gen:()=>makeProblem(pick(S.pool))});runSession();
+  setTimeout(()=>{pose('#me','pose-bow',1200);pose('#riv','pose-bow',1200)},200)}
+function sparArena(a){const p=P(),r=S.rival;
+  a.innerHTML=`<div class="score"><div class="sc"><b>${esc(p.name)}</b><span id="ps">${S.ps}</span></div><div class="vs">First to 5</div><div class="sc"><b>${r.name}</b><span id="rs">${S.rs}</span></div></div>
+   <div class="rbar"><div class="rtrack"><i id="rbar"></i></div><small id="rtxt">${r.name} is thinking…</small></div>
+   <div class="fighter p1 idle" id="me">${avatarSVG(lookOf(p))}</div><div class="fighter p2 idle flip" id="riv">${avatarSVG(Object.assign({},r.look,{belt:r.belt}))}</div>`}
+function sparStop(){if(sparRAF)cancelAnimationFrame(sparRAF);sparRAF=null}
+function sparStart(){sparStop();const m=MOVE[S.prob.move];const T=Math.max(2.2,m.target*S.factor*(.85+Math.random()*.3));S.rT=T;const t0=performance.now();
+  const tick=()=>{if(!S||S.mode!=='spar')return sparStop();if(S.lock||S.phase!=='answer'){sparRAF=requestAnimationFrame(tick);return}
+    const e=(performance.now()-t0)/1000,bar=$('#rbar');if(bar)bar.style.width=Math.min(100,e/T*100)+'%';
+    if(e>=T){sparStop();rivalScores(true);return}sparRAF=requestAnimationFrame(tick)};
+  sparRAF=requestAnimationFrame(tick)}
+function rivalScores(slow){const r=S.rival;S.lock=true;if(slow){S.misses++;S.combo=0;record(false,S.rT)}
+  S.rs++;$('#rs').textContent=S.rs;pose('#riv','pose-kick',700);setTimeout(()=>{sfx.chop(1)},250);
+  const tx=$('#rtxt');if(tx)tx.textContent=`${r.name}: "${fmt(S.prob.ans)}!"`;
+  fxText(`${r.name} +1`,'62%','30%','#3a7bdc');if(S.rs>=5)S.over=true;
+  setTimeout(()=>{S.lock=false;enterFix()},700)}
+function sparPoint(ok){sparStop();
+  if(!ok){rivalScores(false);return}
+  S.ps++;$('#ps').textContent=S.ps;S.combo++;S.bestCombo=Math.max(S.bestCombo,S.combo);
+  pose('#me',Math.random()<.5?'pose-kick':'pose-punch',700);pose('#riv','pose-oops',600);setTimeout(()=>sfx.chop(1),250);
+  fxText('+1 point!','20%','30%','#d64545');if(S.ps>=5)S.over=true;
+  setTimeout(()=>{S.lock=false;S.idx++;nextProblem()},950)}
+function fxText(t,l,tp,c){const ar=$('#arena');if(!ar)return;const f=document.createElement('div');f.className='hitfx';f.style.left=l;f.style.top=tp;f.style.color=c;f.textContent=t;ar.appendChild(f);setTimeout(()=>f.remove(),1000)}
+
+/* ---------- finish hook for extra modes ---------- */
+function finishExtra(s,ok){
+  const p=P();
+  if(s.mode==='spar'){sparStop();const win=s.ps>=5,r=s.rival,rec=p.rival[r.name]||(p.rival[r.name]={wins:0,losses:0,factor:1.6});
+    if(win){rec.wins++;rec.factor=Math.max(.7,+(rec.factor-.12).toFixed(2))}else{rec.losses++;rec.factor=Math.min(2.4,+(rec.factor+.15).toFixed(2))}
+    const coins=win?25:8;p.coins+=coins;if(s.bestCombo>p.records.bestCombo)p.records.bestCombo=s.bestCombo;persist();win?(sfx.win(),confetti(40)):sfx.gong();
+    modal(`<h2 style="font-size:32px">${win?'You win the match!':`${r.name} wins this time`}</h2>
+      <div class="row center" style="gap:0"><div style="width:130px;height:180px" class="idle pose-bow">${avatarSVG(lookOf(p))}</div><div style="width:130px;height:180px" class="idle pose-bow flip">${avatarSVG(Object.assign({},r.look,{belt:r.belt}))}</div></div>
+      <div class="statrow"><div class="stat"><b>${s.ps} – ${s.rs}</b><small>score</small></div><div class="stat"><b>${rec.wins}</b><small>wins vs ${r.name}</small></div><div class="stat"><b>+${coins}</b><small>coins</small></div></div>
+      <p class="sub">${win?`${r.name} bows. "Good match! I'll train harder — next time I'll be faster."`:`${r.name} bows. "Good match! Practice your moves and challenge me again."`}</p>
+      <div class="row center"><button class="btn big primary" id="re">Rematch 🤜</button><button class="btn big" id="hb">Dojo</button></div>`,m=>{
+      m.querySelector('#re').onclick=()=>{closeModal();startSpar()};m.querySelector('#hb').onclick=()=>{closeModal();goHub()}});return}
+  if(window.finishExtra2)return finishExtra2(s,ok);
+  goHub();
+}
+
+/* ---------- TIMES-TABLE CHANT (小九九) ---------- */
+const ONES=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+const words=n=>n<20?ONES[n]:TENS[Math.floor(n/10)]+(n%10?'-'+ONES[n%10]:'');
+function chantLines(row){const L=[];if(row==='mix'){for(let b=2;b<=9;b++)for(let a=1;a<=b;a++)L.push([a,b]);return L}for(let a=1;a<=row;a++)L.push([a,row]);return L}
+let C=null;
+function chantStop(){if(C&&C.iv)clearInterval(C.iv);if(C&&C.to)clearTimeout(C.to);C=null}
+function drum(k){if(k===0){tone(70,.25,'sine',.35,-30);noise(.05,.15,300)}else if(k===2){noise(.12,.18,2600)}else{noise(.03,.06,7000)}}
+function goChant(){chantStop();const p=P();p.chant=p.chant||{};
+  const rows=[2,3,4,5,6,7,8,9].map(r=>{const c=p.chant[r]||{};return `<div class="mcard" data-row="${r}"><div class="ico" style="font-size:30px;font-weight:900">×${r}</div><div><b>The ${r}s</b>${starStr(c.stars||0)}<br><small>${r} lines</small></div></div>`}).join('');
+  const mx=p.chant.mix||{};
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:30px">🥁 Times-Table Chant</h2></div>
+   <div class="panel" style="margin-top:12px">${masterHTML('In China, kids learn the <b>小九九</b> — "little nine-nine" — a times-table song. The trick: <b>always say the smaller number first</b>. Then 7 × 3 and 3 × 7 are the same line, so there are only <b>45 facts</b> to learn, not 81!')}</div>
+   <div class="panel" style="margin-top:14px"><h3 style="font-size:20px">Pick a row</h3><div class="mgrid">${rows}<div class="mcard" data-row="mix"><div class="ico">🌀</div><div><b>All 45 facts</b>${starStr(mx.stars||0)}<br><small>Master mix</small></div></div></div></div>`);
+  bind({'#back':()=>goHub(),'[data-row]':(e,el)=>chantRow(el.dataset.row==='mix'?'mix':+el.dataset.row)});
+}
+function chantRow(row){
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:28px">🥁 ${row==='mix'?'All 45 facts':`The ${row}s`}</h2></div>
+   <div class="panel" style="margin-top:12px;text-align:center"><div class="steps3" style="margin-top:0">
+    <div class="stepbtn" id="listen"><span>🎵</span><b>1. Chant along</b><small>Read the lines on the beat</small></div>
+    <div class="stepbtn" id="play"><span>🥁</span><b>2. Beat challenge</b><small>Tap the answer before the beat ends</small></div>
+    <div class="stepbtn" id="table"><span>📜</span><b>See the table</b><small>All lines in this row</small></div></div></div>`);
+  bind({'#back':()=>goChant(),'#listen':()=>chantPlay(row,'listen'),'#play':()=>chantPlay(row,'play'),'#table':()=>{
+    const L=chantLines(row);modal(`<h2>${row==='mix'?'The 45 facts':`The ${row}s`}</h2><div class="ctable">${L.map(([a,b])=>`<div><b>${a} × ${b}</b> = ${a*b}</div>`).join('')}</div><button class="btn big primary" id="ok">Close</button>`,m=>m.querySelector('#ok').onclick=closeModal)}});
+}
+function chantPlay(row,mode){chantStop();
+  const lines=mode==='listen'?chantLines(row):shuffle(chantLines(row).slice()).concat(row==='mix'?[]:shuffle(chantLines(row).slice())).slice(0,15);
+  C={row,mode,lines,i:-1,beat:0,bpm:mode==='listen'?92:72,score:0,combo:0,best:0,correct:0,answered:false,choices:[]};
+  APP.innerHTML=`<div class="screen" id="scr"><div class="wrap" style="max-width:900px"><div class="row"><button class="iconbtn" id="quit">✕</button><b style="font-size:20px">🥁 ${mode==='listen'?'Chant along':'Beat challenge'}</b><div class="spacer"></div><span class="chip" id="cs">${mode==='play'?'Score 0':''}</span></div>
+   <div class="chant panel" style="margin-top:12px"><div class="beats" id="beats"><i></i><i></i><i></i><i></i></div><div class="cline" id="cl">Get ready…</div><div class="cwords" id="cw"></div><div class="cchoices" id="cc"></div><div class="cprog" id="cp"></div></div></div></div>`;
+  $('#quit').onclick=()=>{sfx.tap();chantStop();chantRow(row)};
+  const per=4,ms=()=>60000/C.bpm;let count=-4;
+  const step=()=>{if(!C)return;const k=((count%per)+per)%per;drum(k);document.querySelectorAll('#beats i').forEach((b,i)=>b.classList.toggle('on',i===k));
+    if(count<0){$('#cl').textContent=count===-1?'Go!':String(-count-1||'');}
+    else if(k===0){if(C.mode==='play'&&C.i>=0&&!C.answered)chantMiss();C.i++;if(C.i>=C.lines.length){clearInterval(C.iv);C.to=setTimeout(chantEnd,ms());return}chantShow()}
+    count++;if(C.mode==='play'&&count>0&&count%per===0){clearInterval(C.iv);C.iv=setInterval(step,ms())}};
+  ac();C.iv=setInterval(step,ms());
+}
+function chantShow(){const [a,b]=C.lines[C.i],ans=a*b,cl=$('#cl'),cw=$('#cw'),cc=$('#cc');C.answered=false;$('#cp').textContent=`${C.i+1} / ${C.lines.length}`;
+  if(C.mode==='listen'){cl.innerHTML=`${a} × ${b} = <b>${ans}</b>`;cw.textContent=`${words(a)} ${words(b)}${a>1?'s':''}, ${words(ans)}`;cl.classList.remove('bump');void cl.offsetWidth;cl.classList.add('bump');speak(`${a} times ${b} is ${ans}`);return}
+  cl.innerHTML=`${a} × ${b} = <b>?</b>`;cw.textContent='';const set=new Set([ans]);const cand=shuffle([ans+a,ans-a,ans+b,ans-b,ans+1,ans-1,ans+10,(a+1)*b,a*(b+1)].filter(x=>x>0&&x!==ans));for(const c of cand){if(set.size>=3)break;set.add(c)}
+  C.choices=shuffle([...set]);cc.innerHTML=C.choices.map(c=>`<button class="btn big" data-c="${c}">${c}</button>`).join('');
+  cc.querySelectorAll('[data-c]').forEach(btn=>btn.addEventListener('pointerdown',e=>{e.preventDefault();if(C.answered)return;C.answered=true;const v=+btn.dataset.c;
+    if(v===ans){btn.classList.add('green');C.correct++;C.combo++;C.best=Math.max(C.best,C.combo);C.score+=100+C.combo*10;sfx.ok();cl.innerHTML=`${a} × ${b} = <b>${ans}</b>`;cw.textContent=C.combo>=3?`🔥 ${C.combo} in a row!`:'';if(C.combo%3===0&&C.bpm<120)C.bpm+=6}
+    else{btn.classList.add('red');chantMiss(true)}
+    $('#cs').textContent=`Score ${C.score}`}));
+}
+function chantMiss(tapped){const [a,b]=C.lines[C.i];C.answered=true;C.combo=0;if(!tapped)sfx.bad();else sfx.bad();$('#cl').innerHTML=`${a} × ${b} = <b style="color:var(--green)">${a*b}</b>`;$('#cw').textContent=`Remember: ${words(a)} ${words(b)}${a>1?'s':''}, ${words(a*b)}`;
+  if(C.bpm>72)C.bpm-=4}
+function chantEnd(){if(!C)return;const p=P(),c=C;chantStop();p.chant=p.chant||{};
+  if(c.mode==='listen'){sfx.win();modal(`<h2>Nice chanting!</h2><p class="sub">Say it out loud a few times. Then try the beat challenge.</p><div class="row center"><button class="btn big primary" id="pl">Beat challenge 🥁</button><button class="btn big" id="bk">Back</button></div>`,m=>{m.querySelector('#pl').onclick=()=>{closeModal();chantPlay(c.row,'play')};m.querySelector('#bk').onclick=()=>{closeModal();chantRow(c.row)}});return}
+  const n=c.lines.length,ratio=c.correct/n,stars=ratio>=.87?3:ratio>=.67?2:ratio>=.47?1:0,rec=p.chant[c.row]||{};const newBest=c.score>(rec.best||0);
+  p.chant[c.row]={best:Math.max(rec.best||0,c.score),stars:Math.max(rec.stars||0,stars)};const coins=c.correct;p.coins+=coins;touchStreak(p);persist();stars>=2?sfx.win():sfx.gong();if(stars===3)confetti(40);
+  modal(`<h2>${stars>=3?'Chant master!':stars>=2?'Great rhythm!':'Keep chanting!'}</h2><div class="bigstars">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3-stars)}</span></div>
+   <div class="statrow"><div class="stat"><b>${c.correct}/${n}</b><small>on the beat</small></div><div class="stat"><b>${c.best}</b><small>best streak</small></div><div class="stat"><b>${c.score}</b><small>${newBest?'new best!':'score'}</small></div><div class="stat"><b>+${coins}</b><small>coins</small></div></div>
+   <div class="row center"><button class="btn big primary" id="pl">Play again</button><button class="btn big" id="bk">Back</button></div>`,m=>{m.querySelector('#pl').onclick=()=>{closeModal();chantPlay(c.row,'play')};m.querySelector('#bk').onclick=()=>{closeModal();goChant()}});
+}
+
+/* ---------- hub buttons ---------- */
+NAV.push({id:'spar',icon:'🤜',label:'Spar',show:p=>MOVES.filter(m=>mr(m.id,p).tried).length>=2,go:()=>startSpar()});
+NAV.push({id:'chant',icon:'🥁',label:'Times-Table Chant',show:p=>!!p.earned.orange||MOVES.some(m=>m.belt==='green'&&mr(m.id,p).tried),go:()=>goChant()});
+window.__extras=window.__extras||{};Object.defineProperties(window.__extras,Object.getOwnPropertyDescriptors({startSpar,goChant,chantPlay,get C(){return C}}));
+
+/* ================= PHASE 3 · MASTER CHALLENGE ARENA + MOVE BOOK ================= */
+
+/* Master challenge: the master watches, classmates cheer, material gets tougher by belt */
+const _drawArena=drawArena;
+drawArena=function(){
+  if(!S||S.mode!=='test')return _drawArena();
+  const a=$('#arena');if(!a)return;const p=P(),b=BELTS[beltIdx(S.beltId)];
+  const mates=RIVALS.slice(0,4).map((r,i)=>`<div class="mate idle" style="left:${8+i*21}%">${avatarSVG(Object.assign({},r.look,{belt:BELTS[Math.max(0,beltIdx(S.beltId)-1)].color}))}</div>`).join('');
+  let boards='';for(let i=0;i<3;i++)boards+=`<div class="board" data-b="${i}"></div>`;
+  a.innerHTML=`<div class="crowd" id="crowd">${mates}</div><div class="scroll"><span>🥋</span>${b.name} Challenge</div>
+   <div class="fighter p1 idle" id="me">${avatarSVG(lookOf(p))}</div>
+   <div class="fighter mwatch idle flip" id="mstr">${avatarSVG(MASTER_LOOK)}</div>
+   <div class="stand" id="stand"><div class="stack" id="stack">${boards}</div><div class="blocks"><i></i><i></i></div></div>
+   <div class="tally" id="tally">${S.results.filter(r=>r&&r.ok).length} / 10 to pass</div>`;
+};
+const _breakBoards=breakBoards;
+breakBoards=function(n,done){if(S&&S.mode==='test'){document.querySelectorAll('#crowd .mate').forEach((m,i)=>setTimeout(()=>{m.classList.remove('pose-cheer');void m.offsetWidth;m.classList.add('pose-cheer')},i*80));pose('#mstr','pose-bow',900)}return _breakBoards(n,done)};
+
+/* ---------- MOVE BOOK ---------- */
+function goBook(){
+  const p=P(),have=MOVES.filter(m=>mr(m.id,p).tried).length,mast=MOVES.filter(m=>starsOf(m.id)>=3).length;
+  const sections=BELTS.map((b,bi)=>{const cards=beltMoves(b.id).map(m=>{const r=mr(m.id,p),got=r.tried>0,st=starsOf(m.id);
+      return `<div class="bookcard ${got?'':'unk'} ${st>=3?'gold':''}" data-bm="${got?m.id:''}"><div class="bi">${got?m.icon:'❔'}</div><b>${got?m.name:'Secret move'}</b>${got?starStr(st):`<small>${b.name}</small>`}${got&&r.best?`<small>Best: ${r.best}s</small>`:''}</div>`}).join('');
+    return `<div class="booksec"><div class="row"><span class="beltdot" style="background:${b.color}"></span><h3>${b.name}</h3><small>${b.goal}</small>${p.earned[b.id]?'<span class="chip">✓</span>':''}</div><div class="bookgrid">${cards}</div></div>`}).join('');
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:30px">📖 Move Book</h2><div class="spacer"></div><span class="chip">${have} / ${MOVES.length} collected</span><span class="chip">⭐ ${mast} mastered</span></div>
+   <div class="panel" style="margin-top:12px">${sections}</div>`);
+  bind({'#back':()=>goHub(),'[data-bm]':(e,el)=>{const id=el.dataset.bm;if(!id){toast('Keep training to discover this move');return}const m=MOVE[id],r=mr(id);
+    modal(`<div style="font-size:60px">${m.icon}</div><h2>${m.name}</h2>${starStr(starsOf(id))}<div style="margin-top:10px;text-align:left">${masterHTML(m.teach)}</div>
+      <div class="statrow"><div class="stat"><b>${r.correct}</b><small>solved</small></div><div class="stat"><b>${r.best?r.best+'s':'—'}</b><small>best avg</small></div><div class="stat"><b>${r.strong}</b><small>strong sessions</small></div></div>
+      <div class="row center"><button class="btn big" id="w">👀 Watch</button><button class="btn big primary" id="t">🪵 Train</button><button class="btn big" id="c">Close</button></div>`,mm=>{
+      mm.querySelector('#w').onclick=()=>{closeModal();goWatch(id,()=>goBook())};mm.querySelector('#t').onclick=()=>{closeModal();startTrain(id)};mm.querySelector('#c').onclick=closeModal})}});
+}
+NAV.push({id:'book',icon:'📖',label:'Move Book',show:()=>true,go:()=>goBook()});
+window.__extras=window.__extras||{};Object.defineProperties(window.__extras,Object.getOwnPropertyDescriptors({goBook}));
+
+/* ================= PHASE 4 · PERCENTS + BLACK BELT FINALE ================= */
+const _beltCeremony=beltCeremony;
+beltCeremony=function(b,score){
+  const p=P();
+  if(b.id==='red'){p.owned['band:gold']=1}
+  if(b.id!=='black')return _beltCeremony(b,score);
+  p.owned['gi:gold']=1;p.owned['band:rainbow']=1;p.owned['mat:gold']=1;p.coins+=200;p.grandmaster=today();persist();
+  sfx.fanfare();setTimeout(()=>sfx.fanfare(),1600);confetti(160);
+  modal(`<h2 style="font-size:36px">🥋 BLACK BELT 🥋</h2><div class="sub" style="margin-top:0">You are a Number Dojo Master</div>
+   <div class="row center" style="gap:0"><div style="height:220px;width:150px" class="idle pose-cheer">${avatarSVG(lookOf(p))}</div><div style="height:220px;width:150px" class="idle pose-bow flip">${avatarSVG(MASTER_LOOK)}</div></div>
+   ${masterHTML(`<b>${esc(p.name)}</b>, you started with Ten Friends. Now you solve percents, 2-digit times and 4-digit numbers in your head. I have nothing left to teach you — only practice keeps a master sharp.`,'idle')}
+   <div class="statrow"><div class="stat"><b>${score}/12</b><small>final challenge</small></div><div class="stat"><b>+250</b><small>coins</small></div><div class="stat"><b>🏅</b><small>Gold uniform, gold boards and rainbow headband unlocked</small></div></div>
+   <div class="row center"><button class="btn big primary" id="ok">Bow to the master</button></div>`,m=>m.querySelector('#ok').onclick=()=>{closeModal();hubBelt=null;goHub()});
+};
+
+/* ================= PHASE 5 · DAILY WARM-UP, SHOP, PARENTS, MUSIC ================= */
+
+/* ---------- daily warm-up (spaced review) ---------- */
+function dueMoves(p=P()){const t=today();return MOVES.filter(m=>{const r=mr(m.id,p);return r.tried&&(!r.next||r.next<=t)})}
+function warmDone(p=P()){return p.warm===today()}
+function startWarm(){const p=P();const tried=MOVES.filter(m=>mr(m.id,p).tried);if(!tried.length){toast('Learn your first move, then warm up tomorrow!');return}
+  const due=dueMoves(p).map(m=>m.id);const pool=due.length?due.concat(due):[];tried.forEach(m=>pool.push(m.id));
+  S=newSession({mode:'warm',total:12,due:new Set(due),gen:()=>makeProblem(pick(pool))});runSession()}
+const _finishExtra=finishExtra;
+finishExtra=function(s,ok){
+  if(s.mode!=='warm')return _finishExtra(s,ok);
+  const p=P(),t=today();
+  // spaced review: correct on a move -> push its next review out; miss -> review again tomorrow
+  const byMove={};s.results.forEach(r=>{if(!r)return;(byMove[r.move]=byMove[r.move]||[]).push(r.ok)});
+  for(const id in byMove){const r=mr(id),allOk=byMove[id].every(Boolean);if(allOk){r.ivl=Math.min(32,Math.max(1,r.ivl||1)*2);r.next=addDays(t,r.ivl)}else{r.ivl=1;r.next=addDays(t,1)}}
+  const first=p.warm!==t;p.warm=t;const coins=s.boards+ok+(first?15:0);p.coins+=coins;if(s.bestCombo>p.records.bestCombo)p.records.bestCombo=s.bestCombo;persist();sfx.win();if(ok>=11)confetti(40);
+  modal(`<h2 style="font-size:30px">Warm-up done! 🔥</h2><div style="font-size:54px">🔥</div><h3>${p.streak.n} day streak</h3>
+    <div class="statrow"><div class="stat"><b>${ok}/12</b><small>correct</small></div><div class="stat"><b>${s.boards}</b><small>boards broken</small></div><div class="stat"><b>+${coins}</b><small>coins${first?' (daily bonus)':''}</small></div></div>
+    <p class="sub">${ok>=10?'Your moves are sharp. See you tomorrow!':'The moves you missed will come back tomorrow so they stick.'}</p><button class="btn big primary" id="hb">Back to the dojo</button>`,m=>m.querySelector('#hb').onclick=()=>{closeModal();goHub()});
+};
+
+/* ---------- shop ---------- */
+const SHOP=[
+  {id:'gi:black',type:'gi',k:'black',name:'Black uniform',cost:80},{id:'gi:teal',type:'gi',k:'teal',name:'Teal uniform',cost:80},
+  {id:'gi:pink',type:'gi',k:'pink',name:'Pink uniform',cost:80},{id:'gi:purple',type:'gi',k:'purple',name:'Purple uniform',cost:80},
+  {id:'gi:gold',type:'gi',k:'gold',name:'Gold uniform',cost:600,note:'or earn the Black Belt'},
+  {id:'band:white',type:'band',k:'white',name:'White headband',cost:40},{id:'band:black',type:'band',k:'black',name:'Black headband',cost:40},
+  {id:'band:gold',type:'band',k:'gold',name:'Gold headband',cost:150,note:'or earn the Red Belt'},{id:'band:rainbow',type:'band',k:'rainbow',name:'Rainbow headband',cost:400},
+  {id:'mat:oak',type:'mat',k:'oak',name:'Oak boards',cost:60},{id:'mat:brick',type:'mat',k:'brick',name:'Bricks',cost:120},{id:'mat:stone',type:'mat',k:'stone',name:'Stone slabs',cost:160},
+  {id:'mat:ice',type:'mat',k:'ice',name:'Ice blocks',cost:200},{id:'mat:glass',type:'mat',k:'glass',name:'Crystal',cost:260},{id:'mat:gold',type:'mat',k:'gold',name:'Gold bars',cost:500}
+];
+function goShop(){const p=P();
+  const item=it=>{const own=!!p.owned[it.id],eq=it.type==='gi'?p.look.gi===it.k:it.type==='band'?p.look.band===it.k:p.equip.material===it.k;
+    const swatch=it.type==='gi'?`<div class="shopsw" style="background:${GIS[it.k]}"></div>`:it.type==='band'?`<div class="shopsw band" style="background:${it.k==='rainbow'?'linear-gradient(90deg,#ff4d4d,#ffd23f,#3cc46a,#3a8cff)':BANDS[it.k]}"></div>`:`<div class="shopmat ${MATERIALS[it.k].cls}"><div class="board"></div><div class="board"></div></div>`;
+    return `<div class="shopitem ${own?'own':''}">${swatch}<b>${it.name}</b>${it.note&&!own?`<small>${it.note}</small>`:''}
+      ${own?`<button class="btn small ${eq?'green':''}" data-eq="${it.id}" ${eq?'disabled':''}>${eq?'Wearing':it.type==='mat'?'Use':'Wear'}</button>`:`<button class="btn small primary" data-buy="${it.id}" ${p.coins<it.cost?'disabled':''}>🪙 ${it.cost}</button>`}</div>`};
+  const sec=(t,type)=>`<h3 style="font-size:20px;margin:14px 0 8px">${t}</h3><div class="shopgrid">${SHOP.filter(i=>i.type===type).map(item).join('')}</div>`;
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:30px">🏮 Dojo Shop</h2><div class="spacer"></div><span class="chip">🪙 ${p.coins}</span></div>
+   <div class="panel" style="margin-top:12px"><div class="row" style="align-items:flex-start"><div style="width:130px;height:180px" class="idle">${avatarSVG(lookOf(p))}</div><div style="flex:1;min-width:220px">${masterHTML('Coins come only from training. Every coin here was earned with your brain!')}</div></div>
+   ${sec('Uniforms','gi')}${sec('Headbands','band')}${sec('Boards to break','mat')}
+   ${p.equip.material?`<div class="row" style="margin-top:12px"><button class="btn small" id="matreset">Use belt boards again</button></div>`:''}</div>`);
+  bind({'#back':()=>goHub(),
+    '[data-buy]':(e,el)=>{const it=SHOP.find(i=>i.id===el.dataset.buy);if(p.coins<it.cost)return;p.coins-=it.cost;p.owned[it.id]=1;applyItem(it);persist();sfx.coin();toast(`${it.name} unlocked!`);goShop()},
+    '[data-eq]':(e,el)=>{applyItem(SHOP.find(i=>i.id===el.dataset.eq));persist();goShop()},
+    '#matreset':()=>{p.equip.material=null;persist();goShop()}});
+  function applyItem(it){if(it.type==='gi')p.look.gi=it.k;else if(it.type==='band')p.look.band=it.k;else p.equip.material=it.k}
+}
+
+/* ---------- parents ---------- */
+function goParentsGate(){
+  modal(`<h2>For grown-ups</h2><p class="sub">Press and hold the button for 3 seconds.</p><button class="btn big" id="hold" style="touch-action:none">Hold me</button><div class="bprogbar" style="margin:14px auto;max-width:280px"><i id="hp" style="width:0"></i></div><button class="btn small" id="cx">Cancel</button>`,m=>{
+    let t=null,st=0;const btn=m.querySelector('#hold'),bar=m.querySelector('#hp');
+    const down=e=>{e.preventDefault();st=performance.now();const tick=()=>{const k=(performance.now()-st)/3000;bar.style.width=Math.min(100,k*100)+'%';if(k>=1){closeModal();goParents();return}t=requestAnimationFrame(tick)};t=requestAnimationFrame(tick)};
+    const up=()=>{cancelAnimationFrame(t);bar.style.width='0'};
+    btn.addEventListener('pointerdown',down);btn.addEventListener('pointerup',up);btn.addEventListener('pointerleave',up);btn.addEventListener('pointercancel',up);
+    m.querySelector('#cx').onclick=closeModal})}
+function goParents(){
+  const p=P(),st=p.stats,acc=st.solved?Math.round(100*st.correct/st.solved):0,avg=st.correct?(st.time/st.correct).toFixed(1):'—';
+  const belts=BELTS.map(b=>`<span class="chip" style="opacity:${p.earned[b.id]?1:.35}"><span class="beltdot" style="background:${b.color};width:22px;height:10px"></span>${b.name}${p.earned[b.id]?` · ${p.earned[b.id]}`:''}</span>`).join(' ');
+  const rows=MOVES.filter(m=>mr(m.id,p).tried).map(m=>{const r=mr(m.id,p),tot=r.correct+r.wrong,a=tot?Math.round(100*r.correct/tot):0,deep=(r.h[2]||0)+(r.h[3]||0),stuck=tot>=6&&(a<70||deep>=4);
+    return `<tr class="${stuck?'stuck':''}"><td>${m.icon} ${m.name}</td><td>${BELTS[beltIdx(m.belt)].name.replace(' Belt','')}</td><td>${starStr(starsOf(m.id))}</td><td>${tot}</td><td>${a}%</td><td>${r.best?r.best+'s':'—'}</td><td>${deep}</td><td>${stuck?'⚠️ Needs help':starsOf(m.id)>=3?'✅ Mastered':'Learning'}</td></tr>`}).join('');
+  const stuckList=MOVES.filter(m=>{const r=mr(m.id,p),tot=r.correct+r.wrong,a=tot?r.correct/tot:1;return tot>=6&&(a<.7||(r.h[2]||0)+(r.h[3]||0)>=4)});
+  screen(`<div class="row"><button class="iconbtn" id="back">←</button><h2 style="font-size:28px">👪 Progress for ${esc(p.name)}</h2></div>
+   <div class="panel" style="margin-top:12px"><div class="statrow" style="justify-content:flex-start"><div class="stat"><b>${earnedCount(p)}</b><small>belts</small></div><div class="stat"><b>${MOVES.filter(m=>starsOf(m.id)>=3).length}/${MOVES.length}</b><small>moves mastered</small></div><div class="stat"><b>${fmt(st.solved)}</b><small>problems</small></div><div class="stat"><b>${acc}%</b><small>accuracy</small></div><div class="stat"><b>${avg}s</b><small>avg answer</small></div><div class="stat"><b>${p.streak.n}</b><small>day streak</small></div><div class="stat"><b>${fmt(p.records.biggest)}</b><small>biggest number solved</small></div></div>
+    <div class="row" style="margin-top:6px">${belts}</div>
+    ${stuckList.length?`<div class="helpbox" style="margin-top:12px"><b>Where ${esc(p.name)} needs help:</b> ${stuckList.map(m=>`${m.icon} ${m.name}`).join(', ')}. Sit together and tap <b>Watch</b> on these moves, then do a Try round side by side.</div>`:`<p class="sub">No trouble spots right now.</p>`}
+    <div style="overflow-x:auto;margin-top:12px;touch-action:pan-x pan-y"><table class="ptable"><thead><tr><th>Move</th><th>Belt</th><th>Stars</th><th>Tries</th><th>Accuracy</th><th>Best avg</th><th>Step-by-step helps</th><th>Status</th></tr></thead><tbody>${rows||'<tr><td colspan="8">No moves started yet.</td></tr>'}</tbody></table></div>
+    <h3 style="margin-top:18px">How the game teaches</h3><p class="sub" style="font-weight:700">Each move is taught in order: <b>Watch</b> (the master demonstrates), <b>Try</b> (untimed, with a hint → step-by-step → full demo → practice the skill underneath), then <b>Train</b> (speed against their own best). Moves come back in the daily warm-up on a spaced schedule so they stick. Methods include the Chinese 凑十法 (make ten), 破十法 (break the ten), 平十法 (down to ten), 想加算减 (think addition) and the 小九九 times-table chant.</p>
+    <div class="row" style="margin-top:16px"><button class="btn small red" id="reset">Reset ${esc(p.name)}'s progress</button><button class="btn small red" id="del">Delete student</button></div></div>`);
+  bind({'#back':()=>goHub(),
+    '#reset':()=>confirmBox(`Reset all of ${esc(p.name)}'s belts, moves and coins?`,()=>{const np=newProfile(p.name,p.look);np.id=p.id;Object.keys(p).forEach(k=>delete p[k]);Object.assign(p,np);persist();toast('Progress reset');goHub()}),
+    '#del':()=>confirmBox(`Delete ${esc(p.name)} from this device?`,()=>{SAVE.profiles=SAVE.profiles.filter(x=>x.id!==p.id);SAVE.cur=null;persist();goProfiles()})});
+}
+function confirmBox(msg,yes){modal(`<h2>Are you sure?</h2><p class="sub">${msg} This can't be undone.</p><div class="row center"><button class="btn big" id="no">Cancel</button><button class="btn big red" id="yes">Yes</button></div>`,m=>{m.querySelector('#no').onclick=closeModal;m.querySelector('#yes').onclick=()=>{closeModal();yes()}})}
+
+/* ---------- music (menus only, soft) ---------- */
+let MUS=null;
+const PENTA=[293.66,329.63,392,440,523.25,587.33,659.25];
+function musicTick(){if(!SAVE.settings.music||!SAVE.settings.sound||S||(typeof C!=='undefined'&&C)||document.hidden)return;const a=AC;if(!a||a.state!=='running')return;
+  const n=PENTA[Math.floor(Math.random()*PENTA.length)];tone(n,1.6,'triangle',.025);if(Math.random()<.35)tone(n/2,2.4,'sine',.02,0,.2)}
+function musicStart(){if(!MUS)MUS=setInterval(musicTick,900)}
+musicStart();
+const _openSettings=openSettings;
+openSettings=function(){_openSettings();const m=$('#modal');if(!m)return;const box=m.querySelector('div[style*="flex-direction:column"]');if(!box)return;
+  const l=document.createElement('label');l.className='btn';l.style.justifyContent='space-between';l.innerHTML=`<span>🎵 Calm music in the dojo</span><input type="checkbox" id="s3" ${SAVE.settings.music?'checked':''} style="width:26px;height:26px">`;
+  box.insertBefore(l,box.children[1]);l.querySelector('#s3').onchange=e=>{SAVE.settings.music=e.target.checked;persist()}};
+
+const _suggestion=suggestion;
+suggestion=function(p=P()){if(MOVES.some(m=>mr(m.id,p).tried)&&!warmDone(p)&&dueMoves(p).length)return{type:'warm',text:`Start with your <b>daily warm-up</b> — ${dueMoves(p).length} move${dueMoves(p).length>1?'s':''} to review`,btn:'Warm up 🔥',go:()=>startWarm()};return _suggestion(p)};
+/* ---------- hub buttons ---------- */
+NAV.unshift({id:'warm',icon:'🔥',label:'Daily warm-up',show:p=>MOVES.some(m=>mr(m.id,p).tried),badge:p=>warmDone(p)?0:'!',go:()=>startWarm()});
+NAV.push({id:'shop',icon:'🏮',label:'Shop',show:()=>true,go:()=>goShop()});
+NAV.push({id:'parents',icon:'👪',label:'Grown-ups',show:()=>true,go:()=>goParentsGate()});
+window.__extras=window.__extras||{};Object.defineProperties(window.__extras,Object.getOwnPropertyDescriptors({startWarm,goShop,goParents,dueMoves}));
+
+/* ---------- boot ---------- */
+load();
+if(P())goHub();else goProfiles();
+if(/[?&]test\b/.test(location.search))window.__dojo={get S(){return S},P,SAVE:()=>SAVE,persist,goHub,goMove,goWatch,startTry,startTrain,startTest,startPlacement,MOVES,MOVE,BELTS,key,submit,mr};
+if(window.__dojo&&window.__extras)Object.defineProperties(window.__dojo,Object.getOwnPropertyDescriptors(window.__extras));
+
+
+</script>
+</body>
+</html>
