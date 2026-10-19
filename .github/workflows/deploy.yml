@@ -20,10 +20,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Assemble site (game picker at the root, each game in its own folder)
         run: |
-          mkdir -p _site
-          cp -r skybreaker-site _site/skybreaker
+          set -e
+          SRC=.
+          if [ -d thiago-arcade-upload ]; then SRC=thiago-arcade-upload; fi
+          mkdir -p _site/skybreaker
+          cp -r skybreaker-site/. _site/skybreaker/
+          if [ -f "$SRC/skybreaker-site/index.html" ]; then cp "$SRC/skybreaker-site/index.html" _site/skybreaker/index.html; fi
           rm -f _site/skybreaker/CNAME
-          if [ -d games ]; then cp -r games/. _site/; else cp -r skybreaker-site/. _site/; fi
+          if [ -d "$SRC/games" ]; then cp -r "$SRC/games/." _site/; else cp -r skybreaker-site/. _site/; fi
           echo "thiago.kareem.si" > _site/CNAME
           find _site -type f | sort
       - uses: actions/configure-pages@v5
