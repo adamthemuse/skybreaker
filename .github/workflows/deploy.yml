@@ -18,9 +18,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Assemble site (game picker at the root, each game in its own folder)
+        run: |
+          mkdir -p _site
+          cp -r skybreaker-site _site/skybreaker
+          rm -f _site/skybreaker/CNAME
+          if [ -d games ]; then cp -r games/. _site/; else cp -r skybreaker-site/. _site/; fi
+          echo "thiago.kareem.si" > _site/CNAME
+          find _site -type f | sort
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: skybreaker-site
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
